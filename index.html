@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JO'TALI × Tostan 2026</title>
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <style>
+  /* ═══════════════════════════════════════
+     SPLASH SCREEN — JOJ × Tostan 2026
+  ═══════════════════════════════════════ */
+  #splash{
+    position:fixed;inset:0;z-index:9999;
+    background:#0a0e1a;overflow:hidden;
+    font-family:'Segoe UI',system-ui,sans-serif;
+  }
+  .scene{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    opacity:0;transition:opacity 1.2s ease-in-out;
+    text-align:center;padding:0 48px;
+  }
+  .scene.active{opacity:1}
+
+  #ambient-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(243,156,18,.10) 0%, transparent 55%),
+      radial-gradient(ellipse at 30% 70%, rgba(39,174,96,.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 75%, rgba(231,76,60,.06) 0%, transparent 50%);
+    animation:s-breathe 8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes s-breathe{
+    0%,100%{opacity:.7;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.08)}
+  }
+
+  .dust{
+    position:absolute;border-radius:50%;
+    background:#F39C12;opacity:0;
+    animation:s-rise var(--d) var(--delay) linear infinite;
+    pointer-events:none;
+  }
+  @keyframes s-rise{
+    0%{transform:translateY(0) translateX(0);opacity:0}
+    10%{opacity:var(--op)}
+    90%{opacity:var(--op)}
+    100%{transform:translateY(-100vh) translateX(var(--drift));opacity:0}
+  }
+
+  /* Scene 1 — Citation */
+  .s-quote-mark{
+    font-size:72px;color:#F39C12;opacity:.2;
+    font-family:Georgia,serif;line-height:0;margin-bottom:16px;
+  }
+  .s-big-quote{
+    font-size:clamp(20px,3vw,36px);font-weight:300;
+    color:#fff;line-height:1.5;max-width:820px;font-style:italic;
+  }
+  .s-author{
+    margin-top:28px;font-size:13px;color:#F39C12;
+    letter-spacing:.22em;text-transform:uppercase;
+  }
+  .s-author::before{content:'— ';color:#445}
+
+  /* Scene 2 — Constat */
+  .s-constat-line{
+    font-size:clamp(18px,2.4vw,28px);color:#aab;
+    font-weight:300;line-height:1.7;max-width:720px;
+  }
+  .s-constat-line strong{color:#fff;font-weight:700}
+  .s-constat-line.dim{
+    color:#445;font-size:clamp(15px,1.8vw,22px);
+    margin-top:22px;
+  }
+
+  /* Scene 3 — Mission */
+  .s-mission-title{
+    font-size:clamp(28px,4.5vw,54px);font-weight:800;
+    color:#fff;line-height:1.15;
+  }
+  .s-mission-title .gold{color:#F39C12}
+  .s-mission-sub{
+    margin-top:18px;font-size:15px;color:#556;
+    letter-spacing:.08em;max-width:580px;line-height:1.8;
+  }
+  .s-pillars{display:flex;gap:32px;margin-top:44px;flex-wrap:wrap;justify-content:center}
+  .s-pillar{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    opacity:0;transform:translateY(16px);
+    transition:opacity .6s,transform .6s;
+  }
+  .s-pillar.show{opacity:1;transform:translateY(0)}
+  .s-pillar-circle{
+    width:60px;height:60px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;border:1.5px solid;
+  }
+  .s-pillar:nth-child(1) .s-pillar-circle{border-color:#27AE60;background:rgba(39,174,96,.08)}
+  .s-pillar:nth-child(2) .s-pillar-circle{border-color:#F39C12;background:rgba(243,156,18,.08)}
+  .s-pillar:nth-child(3) .s-pillar-circle{border-color:#2980B9;background:rgba(41,128,185,.08)}
+  .s-pillar:nth-child(4) .s-pillar-circle{border-color:#E74C3C;background:rgba(231,76,60,.08)}
+  .s-pillar-label{font-size:10px;color:#667;letter-spacing:.14em;text-transform:uppercase}
+
+  /* Scene 4 — Final */
+  .s-rings{display:flex;margin-bottom:28px}
+  .s-ring{width:32px;height:32px;border-radius:50%;border:3px solid;display:inline-block}
+  .s-ring:nth-child(n+2){margin-left:-10px}
+  .sr1{border-color:#0085C7}.sr2{border-color:#F4C300}
+  .sr3{border-color:#009F6B}.sr4{border-color:#DF0024}.sr5{border-color:#fff}
+
+  .s-final-title{
+    font-size:clamp(28px,4.5vw,52px);font-weight:800;
+    color:#fff;line-height:1.2;
+  }
+  .s-final-title .gold{color:#F39C12}
+  .s-final-sub{
+    margin-top:14px;font-size:12px;color:#445;
+    letter-spacing:.18em;text-transform:uppercase;
+  }
+  /* Points de progression */
+  #s-dots{
+    position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+    display:flex;gap:10px;z-index:10;
+  }
+  .s-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:rgba(255,255,255,.15);
+    transition:background .3s,transform .3s;
+    cursor:pointer;
+  }
+  .s-dot.active{background:#F39C12;transform:scale(1.5)}
+
+  /* Bouton passer */
+  #s-skip{
+    position:absolute;top:24px;right:28px;z-index:10;
+    background:none;border:none;color:#334;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    cursor:pointer;transition:color .2s;padding:8px;
+  }
+  #s-skip:hover{color:#778}
+
+  /* Barre de progression en bas */
+  #s-loader{
+    position:absolute;bottom:0;left:0;height:2px;
+    background:linear-gradient(90deg,#27AE60 0%,#F39C12 40%,#E74C3C 70%,#2980B9 100%);
+    width:0%;transition:width .1s linear;
+  }
+
+  /* Fade out final */
+  #splash.out{
+    opacity:0;transition:opacity .8s ease-in-out;
+    pointer-events:none;
+  }
+
+  /* ═══════════════════════════════════════
+     HUB — ÉCRAN DES 3 PORTES
+  ═══════════════════════════════════════ */
+  #hub{
+    position:fixed;inset:0;z-index:5;
+    background:
+      radial-gradient(ellipse at 30% 15%, rgba(243,156,18,.09) 0%, transparent 55%),
+      radial-gradient(ellipse at 75% 85%, rgba(27,67,50,.45) 0%, transparent 60%),
+      linear-gradient(160deg,#0a0e1a 0%,#12201a 55%,#1B4332 140%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity 1s ease-in-out;
+    padding:60px 24px;overflow-y:auto;
+    font-family:'Segoe UI',system-ui,sans-serif;
+  }
+  #hub.show{opacity:1;pointer-events:auto}
+
+  .hub-header{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:56px;text-align:center}
+  .hub-header .olympic-rings{gap:4px}
+  .hub-header-text h1{font-size:clamp(24px,3.6vw,38px);color:#fff;font-weight:800}
+  .hub-header-text h1 .gold{color:#F39C12}
+  .hub-header-text p{margin-top:8px;font-size:13px;color:#8fae9c;letter-spacing:.2em;text-transform:uppercase}
+
+  .hub-doors{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;max-width:1100px}
+  .hub-door{
+    width:300px;padding:36px 28px;border-radius:18px;
+    background:rgba(255,255,255,.03);
+    border:1.5px solid rgba(243,156,18,.18);
+    text-decoration:none;color:#fff;
+    display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+    transition:transform .25s ease,border-color .25s ease,background .25s ease;
+  }
+  .hub-door:hover{
+    transform:translateY(-6px);
+    border-color:#F39C12;
+    background:rgba(243,156,18,.06);
+  }
+  .hub-door-icon{font-size:34px}
+  .hub-door h2{font-size:19px;font-weight:700}
+  .hub-door p{font-size:13px;color:#a9c2b4;line-height:1.6;min-height:66px;margin:0}
+  .hub-door-cta{
+    margin-top:auto;font-size:12px;font-weight:700;color:#F39C12;
+    letter-spacing:.12em;text-transform:uppercase;
+  }
+
+  .hub-footer{margin-top:52px;font-size:11px;color:#4a6156;letter-spacing:.14em;text-transform:uppercase}
+
+  @media (max-width:720px){
+    .hub-doors{flex-direction:column;align-items:center}
+    .hub-door{width:100%;max-width:360px}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SPLASH SCREEN
+════════════════════════════════════════════════════ -->
+<div id="splash">
+  <div id="ambient-bg"></div>
+  <div id="s-dust"></div>
+  <button id="s-skip" onclick="splashExit()">Passer ›</button>
+
+  <!-- Acte 1 : Citation Mandela -->
+  <div class="scene active" id="scene1">
+    <div class="s-quote-mark">"</div>
+    <div class="s-big-quote">
+      Le sport a le pouvoir de changer le monde.<br>
+      Il a le pouvoir d'inspirer.<br>
+      Il a le pouvoir d'unir les peuples.
+    </div>
+    <div class="s-author">Nelson Mandela</div>
+  </div>
+
+  <!-- Acte 2 : Le constat -->
+  <div class="scene" id="scene2">
+    <div class="s-constat-line">
+      Les Jeux Olympiques de la Jeunesse arrivent à <strong>Dakar en 2026</strong>.
+    </div>
+    <div class="s-constat-line dim">
+      Mais beaucoup de jeunes risquent de les regarder de loin —<br>
+      depuis leur village, loin des projecteurs.
+    </div>
+  </div>
+
+  <!-- Acte 3 : La mission -->
+  <div class="scene" id="scene3">
+    <div class="s-mission-title">
+      Et si l'esprit des Jeux<br>voyageait jusqu'à <span class="gold">eux</span> ?
+    </div>
+    <div class="s-mission-sub">
+      JO'TALI porte le sport, le dialogue et le leadership<br>
+      directement dans les communautés du Sénégal.
+    </div>
+    <div class="s-pillars">
+      <div class="s-pillar" id="sp1">
+        <div class="s-pillar-circle">⚽</div>
+        <div class="s-pillar-label">Sport & jeu</div>
+      </div>
+      <div class="s-pillar" id="sp2">
+        <div class="s-pillar-circle">💬</div>
+        <div class="s-pillar-label">Dialogue</div>
+      </div>
+      <div class="s-pillar" id="sp3">
+        <div class="s-pillar-circle">🌱</div>
+        <div class="s-pillar-label">Leadership</div>
+      </div>
+      <div class="s-pillar" id="sp4">
+        <div class="s-pillar-circle">🏘️</div>
+        <div class="s-pillar-label">Héritage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acte 4 : Titre final + CTA -->
+  <div class="scene" id="scene4">
+    <div class="s-rings">
+      <div class="s-ring sr1"></div>
+      <div class="s-ring sr2"></div>
+      <div class="s-ring sr3"></div>
+      <div class="s-ring sr4"></div>
+      <div class="s-ring sr5"></div>
+    </div>
+    <div class="s-final-title">
+      Ramener les Jeux<br>dans les <span class="gold">communautés</span>
+    </div>
+    <div class="s-final-sub">JO'TALI × Tostan · Plateforme 2026</div>
+  </div>
+
+  <!-- Points de progression -->
+  <div id="s-dots">
+    <div class="s-dot active" onclick="splashGoTo(1)"></div>
+    <div class="s-dot" onclick="splashGoTo(2)"></div>
+    <div class="s-dot" onclick="splashGoTo(3)"></div>
+    <div class="s-dot" onclick="splashGoTo(4)"></div>
+  </div>
+
+  <div id="s-loader"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     HUB — 3 PORTES
+════════════════════════════════════════════════════ -->
+<div id="hub">
+  <header class="hub-header">
+    <div class="olympic-rings">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="ring ring-4"></div>
+      <div class="ring ring-5"></div>
+    </div>
+    <div class="hub-header-text">
+      <h1>JO'TALI <span class="gold">×</span> Tostan 2026</h1>
+      <p>Choisissez votre espace</p>
+    </div>
+  </header>
+
+  <div class="hub-doors">
+    <a class="hub-door" href="presentation.html">
+      <div class="hub-door-icon">🎤</div>
+      <h2>Présentation</h2>
+      <p>Vision, contexte, les 3 piliers sport/culture/citoyenneté, trajectoire pré/pendant/post-JOJ, budget & partenaires</p>
+      <span class="hub-door-cta">Découvrir →</span>
+    </a>
+    <a class="hub-door" href="selection.html">
+      <div class="hub-door-icon">🗺️</div>
+      <h2>Sélection</h2>
+      <p>Carte interactive, statistiques, analyse spatiale et liste des 300 communautés pilotes</p>
+      <span class="hub-door-cta">Explorer →</span>
+    </a>
+    <a class="hub-door" href="planification.html">
+      <div class="hub-door-icon">📋</div>
+      <h2>Planification & Suivi</h2>
+      <p>Pilotage des activités, activités terrain, calendrier, budget et évaluation du programme</p>
+      <span class="hub-door-cta">Piloter →</span>
+    </a>
+  </div>
+
+  <div class="hub-footer">JO'TALI × Tostan · Team SERA · 2026</div>
+</div>
+
+<!-- ══ SPLASH SCRIPT ══════════════════════════════════════ -->
+<script>
+(function(){
+  const SEEN_KEY = 'jojtostan_splash_seen';
+
+  // Animation déjà vue cette session : on saute directement au hub
+  if (sessionStorage.getItem(SEEN_KEY)) {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('hub').classList.add('show');
+    return;
+  }
+
+  // Poussière dorée flottante
+  const dc = document.getElementById('s-dust');
+  const COLORS = ['#F39C12','#27AE60','#E74C3C','#2980B9'];
+  for(let i=0;i<40;i++){
+    const d=document.createElement('div');
+    d.className='dust';
+    const size=Math.random()*2.5+1;
+    d.style.cssText=`
+      left:${Math.random()*100}%;bottom:-10px;
+      width:${size}px;height:${size}px;
+      background:${COLORS[Math.floor(Math.random()*4)]};
+      --d:${9+Math.random()*9}s;
+      --delay:-${Math.random()*18}s;
+      --op:${.15+Math.random()*.35};
+      --drift:${(Math.random()-.5)*140}px;
+    `;
+    dc.appendChild(d);
+  }
+
+  let current = 1;
+
+  window.splashGoTo = function(n){
+    document.getElementById('scene'+current).classList.remove('active');
+    current = n;
+    document.getElementById('scene'+current).classList.add('active');
+    document.querySelectorAll('.s-dot').forEach((d,i)=>{
+      d.classList.toggle('active', i+1===n);
+    });
+    // Animer piliers si scene 3
+    if(n===3){
+      ['sp1','sp2','sp3','sp4'].forEach((id,i)=>{
+        setTimeout(()=>document.getElementById(id).classList.add('show'), 700+i*350);
+      });
+    }
+  };
+
+  // Barre de progression
+  const lb = document.getElementById('s-loader');
+  const TOTAL = 22000;
+  const start = Date.now();
+  const loaderInterval = setInterval(()=>{
+    const pct = Math.min((Date.now()-start)/TOTAL*100, 99);
+    lb.style.width = pct+'%';
+    if(pct>=99) clearInterval(loaderInterval);
+  },100);
+
+  // Séquence automatique, avec sortie auto après le dernier acte
+  setTimeout(()=>splashGoTo(2), 7000);   // Acte 1 : 7s
+  setTimeout(()=>splashGoTo(3), 14000);  // Acte 2 : 7s
+  setTimeout(()=>splashGoTo(4), 22000);  // Acte 3 : 8s
+  setTimeout(()=>splashExit(), 24500);   // Acte 4 : lecture puis sortie auto (2.5s)
+
+  let exited = false;
+  window.splashExit = function(){
+    if(exited) return;
+    exited = true;
+    sessionStorage.setItem(SEEN_KEY, '1');
+
+    // 1. Fade out du splash
+    document.getElementById('splash').classList.add('out');
+    lb.style.width='100%';
+    clearInterval(loaderInterval);
+
+    // 2. Révéler le hub légèrement avant que le splash disparaisse
+    //    (overlap fluide)
+    setTimeout(()=>{
+      document.getElementById('hub').classList.add('show');
+    }, 600);
+
+    // 3. Masquer le splash complètement après le fondu
+    setTimeout(()=>{
+      const el = document.getElementById('splash');
+      if(el) el.style.display='none';
+    }, 1800);
+  };
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": 1,
+        "nom": "Zone 1 – Kolda & Sédhiou",
+        "color": "#27AE60",
+        "nb_communautes": 141
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -16.2,
+              11.9
+            ],
+            [
+              -13.5,
+              11.9
+            ],
+            [
+              -13.5,
+              13.7
+            ],
+            [
+              -16.2,
+              13.7
+            ],
+            [
+              -16.2,
+              11.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": 2,
+        "nom": "Zone 2 – Tambacounda & Kédougou",
+        "color": "#E74C3C",
+        "nb_communautes": 59
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -13.5,
+              12.3
+            ],
+            [
+              -12.3,
+              12.3
+            ],
+            [
+              -12.3,
+              14.9
+            ],
+            [
+              -13.5,
+              14.9
+            ],
+            [
+              -13.5,
+              12.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": 3,
+        "nom": "Zone 3 – Matam",
+        "color": "#2980B9",
+        "nb_communautes": 100
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -15.0,
+              14.5
+            ],
+            [
+              -12.4,
+              14.5
+            ],
+            [
+              -12.4,
+              16.3
+            ],
+            [
+              -15.0,
+              16.3
+            ],
+            [
+              -15.0,
+              14.5
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

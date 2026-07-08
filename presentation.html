@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JO'TALI × Tostan 2026 — Présentation</title>
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <style>
+  body{
+    background: linear-gradient(160deg, #0a0e1a 0%, var(--forest2) 55%, var(--forest) 140%);
+  }
+
+  .pres-page{
+    font-family:'Segoe UI',system-ui,sans-serif;
+  }
+
+  .pres-section{ padding: 22px 24px; max-width: 980px; margin: 0 auto; }
+  .pres-section-title{
+    font-size: clamp(20px,2.6vw,28px); font-weight: 800; color:#fff;
+    text-align:center; margin-bottom: 18px; line-height:1.35;
+  }
+
+  /* Hero */
+  .pres-hero{
+    padding: 44px 24px 22px; text-align:center; max-width:840px; margin:0 auto;
+  }
+  .pres-eyebrow{
+    font-size:12px; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--gold); font-weight:700; margin-bottom:14px;
+  }
+  .pres-hero h1{
+    font-size:clamp(28px,4.4vw,48px); font-weight:800; color:#fff; line-height:1.2;
+  }
+  .pres-hero h1 .gold{ color:var(--gold); }
+  .pres-lead{
+    margin-top:16px; font-size:16px; line-height:1.85; color:#a9c2b4;
+  }
+
+  /* Pourquoi */
+  .pres-why h2{
+    font-size:clamp(20px,2.8vw,30px); font-weight:800; color:#fff;
+    text-align:center; line-height:1.4; margin-bottom:14px;
+  }
+  .pres-why p{ font-size:15px; line-height:1.9; color:#a9c2b4; margin-bottom:18px; }
+  .pres-why p:last-child{ margin-bottom:0; }
+
+  /* Piliers */
+  .piliers-grid{ display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+  .pilier-card{
+    flex:1 1 260px; max-width:300px;
+    background:rgba(255,255,255,.03); border:1.5px solid rgba(243,156,18,.18);
+    border-radius:16px; padding:30px 26px;
+  }
+  .pilier-icon{ font-size:32px; margin-bottom:14px; }
+  .pilier-card h3{ font-size:17px; font-weight:700; color:var(--gold); margin-bottom:10px; }
+  .pilier-card p{ font-size:13.5px; line-height:1.75; color:#a9c2b4; margin:0; }
+
+  /* Trajectoire */
+  .traj-grid{ display:flex; gap:18px; align-items:stretch; flex-wrap:wrap; justify-content:center; }
+  .traj-card{
+    flex:1 1 240px; max-width:280px;
+    background:rgba(255,255,255,.03); border:1.5px solid rgba(255,255,255,.1);
+    border-radius:16px; padding:26px 22px;
+  }
+  .traj-phase{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; color:#0a0e1a; background:var(--gold);
+    padding:4px 12px; border-radius:20px; margin-bottom:14px;
+  }
+  .traj-card h3{ font-size:16px; font-weight:700; color:#fff; margin-bottom:10px; }
+  .traj-card p{ font-size:13px; line-height:1.7; color:#a9c2b4; margin:0; }
+  .traj-arrow{ align-self:center; font-size:22px; color:var(--gold2); }
+
+  /* Chiffres */
+  .chiffres-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:18px;
+  }
+  .chiffre-card{
+    text-align:center; padding:28px 18px; border-radius:16px;
+    background:rgba(243,156,18,.05); border:1.5px solid rgba(243,156,18,.2);
+  }
+  .chiffre-val{ font-size:1.5rem; font-weight:800; color:var(--gold); line-height:1.2; }
+  .chiffre-sub{ font-size:12px; color:#8fae9c; margin-top:2px; }
+  .chiffre-label{ margin-top:8px; font-size:12px; color:#a9c2b4; letter-spacing:.03em; }
+
+  /* Thématiques */
+  .thema-list{ display:flex; flex-direction:column; gap:14px; }
+  .thema-item{
+    background:rgba(255,255,255,.03); border-left:4px solid var(--gold);
+    border-radius:10px; padding:18px 22px;
+  }
+  .thema-item h3{ font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; }
+  .thema-item p{ font-size:13.5px; line-height:1.7; color:#a9c2b4; margin:0; }
+
+  /* Documents */
+  .pres-docs-panel{
+    background:var(--card); border-radius:20px; padding:32px;
+  }
+  .pres-docs-panel .docs-title{ margin-bottom:14px; }
+  .pres-docs-panel .docs-grid{ grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+
+  /* Partenaires */
+  .pres-partenaires p{ font-size:15px; line-height:1.9; color:#a9c2b4; margin-bottom:18px; }
+  .partenaires-list{ list-style:none; padding:0; margin:0 0 32px; display:flex; flex-direction:column; gap:12px; }
+  .partenaires-list li{
+    font-size:14px; line-height:1.7; color:#c9dbd0; padding-left:24px; position:relative;
+  }
+  .partenaires-list li::before{
+    content:'✓'; position:absolute; left:0; color:var(--gold); font-weight:800;
+  }
+  .pres-quote{
+    margin:0; padding:26px 30px; border-left:4px solid var(--gold);
+    background:rgba(243,156,18,.05); border-radius:0 12px 12px 0;
+    font-style:italic; font-size:15px; line-height:1.8; color:#fff;
+  }
+
+  .pres-footer{ text-align:center; padding:12px 24px 28px; }
+
+  @media (max-width:640px){
+    .traj-arrow{ transform:rotate(90deg); }
+  }
+  </style>
+</head>
+<body>
+
+<header class="app-header brand-forest">
+  <div class="header-brand">
+    <div class="olympic-rings">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="ring ring-4"></div>
+      <div class="ring ring-5"></div>
+    </div>
+    <div class="header-title">
+      <h1>🎤 JO'TALI × Tostan 2026 — Présentation</h1>
+      <p>Vision, contexte, piliers, trajectoire, budget & partenaires</p>
+    </div>
+  </div>
+  <nav class="space-switcher">
+    <a href="index.html" class="sw-link">🏠 Hub</a>
+    <a href="presentation.html" class="sw-link sw-active">🎤 Présentation</a>
+    <a href="selection.html" class="sw-link">🗺️ Sélection</a>
+    <a href="planification.html" class="sw-link">📋 Planification</a>
+  </nav>
+</header>
+
+<main class="pres-page">
+
+  <!-- HERO -->
+  <section class="pres-hero">
+    <p class="pres-eyebrow">JO'TALI × Tostan · Les Olympiades communautaires</p>
+    <h1>Faire vivre l'esprit des Jeux <span class="gold">au cœur des communautés</span></h1>
+    <p class="pres-lead">
+      JO'TALI est une initiative communautaire d'inclusion des jeunes autour des Jeux Olympiques de la Jeunesse.
+      Elle vise à faire des JOJ Dakar 2026 non seulement un événement national et international, mais aussi une
+      expérience vécue dans les communautés — à travers le sport, la culture et l'engagement citoyen portés par les jeunes.
+    </p>
+  </section>
+
+  <!-- POURQUOI CE PROJET -->
+  <section class="pres-section pres-why">
+    <h2>Le risque n'est pas que les jeunes entendent parler des Jeux.<br>C'est qu'ils ne les vivent pas.</h2>
+    <p>
+      En 2026, le Sénégal accueillera les Jeux Olympiques de la Jeunesse, premier événement olympique organisé
+      sur le continent africain. La dynamique se déploiera autour des sites officiels de Dakar et Diamniadio.
+      Pour les communautés rurales et périurbaines, l'enjeu n'est pas de reproduire les Jeux, mais de permettre
+      à leur esprit de devenir une expérience locale, portée par les jeunes et ancrée dans les réalités communautaires.
+    </p>
+    <p>
+      Le risque n'est pas seulement que certains jeunes entendent parler des JOJ à distance. Le risque est qu'ils
+      restent spectateurs d'un événement qui pourrait aussi leur permettre de participer, de s'organiser, de coopérer,
+      de créer et de se sentir partie prenante d'un moment historique.
+    </p>
+  </section>
+
+  <!-- 3 PILIERS -->
+  <section class="pres-section pres-piliers">
+    <h2 class="pres-section-title">Trois leviers, une même ambition</h2>
+    <div class="piliers-grid">
+      <div class="pilier-card">
+        <div class="pilier-icon">⚽</div>
+        <h3>Sport</h3>
+        <p>
+          Des activités sportives accessibles, adaptées aux moyens locaux et inspirées de l'esprit des JOJ,
+          où se vivent concrètement les règles, l'effort, la coopération, l'inclusion et le fair-play.
+        </p>
+      </div>
+      <div class="pilier-card">
+        <div class="pilier-icon">🎭</div>
+        <h3>Culture</h3>
+        <p>
+          Musique, danse, théâtre, artisanat, productions locales, récits et savoir-faire : des espaces où les jeunes
+          expriment leur créativité, leur responsabilité et leur fierté collective.
+        </p>
+      </div>
+      <div class="pilier-card">
+        <div class="pilier-icon">🤝</div>
+        <h3>Engagement citoyen</h3>
+        <p>
+          Organiser, animer, arbitrer, coordonner, présenter, dialoguer : des rôles actifs et visibles où les jeunes
+          apprennent le leadership, la responsabilité et la gouvernance locale.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAJECTOIRE -->
+  <section class="pres-section pres-trajectoire">
+    <h2 class="pres-section-title">Un pilote maîtrisé, puis une amplification progressive</h2>
+    <div class="traj-grid">
+      <div class="traj-card">
+        <span class="traj-phase">Pré-JOJ</span>
+        <h3>Préparer et tester</h3>
+        <p>
+          Cartographie des pratiques sportives, culturelles et communautaires ; choix du périmètre pilote ;
+          mobilisation des relais ; conception des formats ; activités pilotes ; premiers supports de
+          communication ; documentation initiale.
+        </p>
+      </div>
+      <div class="traj-arrow">→</div>
+      <div class="traj-card">
+        <span class="traj-phase">Pendant les JOJ</span>
+        <h3>Connecter et rendre visible</h3>
+        <p>
+          Activités communautaires reliées à la dynamique des Jeux ; sensibilisation autour de l'esprit des JOJ ;
+          valorisation des jeunes, des cultures locales et des communautés ; communication locale ou digitale ;
+          lien symbolique avec l'événement national.
+        </p>
+      </div>
+      <div class="traj-arrow">→</div>
+      <div class="traj-card">
+        <span class="traj-phase">Post-JOJ</span>
+        <h3>Prolonger et amplifier</h3>
+        <p>
+          Capitalisation du pilote ; ajustement du modèle ; mobilisation de partenaires ; poursuite des activités
+          sportives, culturelles et citoyennes ; extension progressive selon les apprentissages, les coûts réels
+          et les ressources mobilisées.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHIFFRES CLÉS -->
+  <section class="pres-section pres-chiffres">
+    <h2 class="pres-section-title">Les chiffres clés</h2>
+    <div class="chiffres-grid">
+      <div class="chiffre-card">
+        <div class="chiffre-val">300</div>
+        <div class="chiffre-label">communautés sélectionnées</div>
+      </div>
+      <div class="chiffre-card">
+        <div class="chiffre-val">15-35 ans</div>
+        <div class="chiffre-label">focus jeunesse</div>
+      </div>
+      <div class="chiffre-card">
+        <div class="chiffre-val">8 647 284 FCFA</div>
+        <div class="chiffre-sub">≈ 15 000 USD</div>
+        <div class="chiffre-label">budget pilote</div>
+      </div>
+      <div class="chiffre-card">
+        <div class="chiffre-val">145 999 000 FCFA</div>
+        <div class="chiffre-sub">≈ 240 130 USD</div>
+        <div class="chiffre-label">amplification consolidée</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 THÉMATIQUES -->
+  <section class="pres-section pres-thematiques">
+    <h2 class="pres-section-title">Partir du vécu des jeunes, pas de concepts abstraits</h2>
+    <div class="thema-list">
+      <div class="thema-item">
+        <h3>Inclusion</h3>
+        <p>Qui participe ? Qui reste à côté ? Comment créer une activité où chacun a une place réelle ?</p>
+      </div>
+      <div class="thema-item">
+        <h3>Leadership & responsabilité</h3>
+        <p>Qui organise ? Qui anime ? Qui arbitre ? Qui prend l'initiative ?</p>
+      </div>
+      <div class="thema-item">
+        <h3>Citoyenneté & gouvernance locale</h3>
+        <p>Comment décide-t-on ensemble ? Qui fixe les règles ? Comment gère-t-on une contestation ?</p>
+      </div>
+      <div class="thema-item">
+        <h3>Culture & fierté communautaire</h3>
+        <p>Que choisit-on de montrer de sa communauté ? Quels savoir-faire, récits, chants ou danses valoriser ?</p>
+      </div>
+      <div class="thema-item">
+        <h3>Bien-être & comportements à risque</h3>
+        <p>Comment gérer la pression, la rivalité, la frustration, l'échec ou la comparaison ?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENTS OFFICIELS -->
+  <section class="pres-section pres-docs">
+    <h2 class="pres-section-title">Documents officiels</h2>
+    <div class="pres-docs-panel">
+      <div class="docs-grid">
+        <div class="doc-card">
+          <div class="doc-icon">📘</div>
+          <div class="doc-info">
+            <div class="doc-name">Note conceptuelle JO'TALI</div>
+            <div class="doc-desc">Le document de référence du projet : vision, approche et trajectoire</div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-btn doc-preview" onclick="ouvrirApercu('note')">👁 Aperçu</button>
+            <a class="doc-btn doc-download"
+               href="documents/Note_conceptuelle_JOTALI.pdf"
+               download>⬇ Télécharger</a>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-icon">📄</div>
+          <div class="doc-info">
+            <div class="doc-name">Pitch de présentation (FR)</div>
+            <div class="doc-desc">La présentation du projet pour les partenaires</div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-btn doc-preview" onclick="ouvrirApercu('pitchfr')">👁 Aperçu</button>
+            <a class="doc-btn doc-download"
+               href="documents/Pitch_JOTALI_FR.pdf"
+               download>⬇ Télécharger</a>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-icon">📄</div>
+          <div class="doc-info">
+            <div class="doc-name">Pitch de présentation (EN)</div>
+            <div class="doc-desc">Project presentation for international partners</div>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-btn doc-preview" onclick="ouvrirApercu('pitchen')">👁 Aperçu</button>
+            <a class="doc-btn doc-download"
+               href="documents/Pitch_JOTALI_EN.pdf"
+               download>⬇ Télécharger</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPEL AUX PARTENAIRES -->
+  <section class="pres-section pres-partenaires">
+    <h2 class="pres-section-title">Transformer un événement mondial en impact social concret</h2>
+    <p>
+      Soutenir JO'TALI, c'est permettre à des jeunes qui ne seront pas présents sur les sites officiels des JOJ
+      de vivre, dans leur propre communauté, une expérience qui leur dit : cet événement vous concerne aussi.
+    </p>
+    <p>Pour les partenaires et donateurs, l'appui à JO'TALI permet :</p>
+    <ul class="partenaires-list">
+      <li>d'investir dans une jeunesse actrice, engagée et responsable</li>
+      <li>de contribuer à un héritage des JOJ fondé sur des pratiques humaines, sociales et culturelles durables, et non uniquement sur des infrastructures</li>
+      <li>d'appuyer une organisation disposant d'un ancrage communautaire éprouvé et d'une méthodologie reconnue</li>
+      <li>de soutenir une démarche pilote, documentée et potentiellement reproductible</li>
+      <li>de transformer un événement mondial en impact social concret, mesurable et racontable</li>
+    </ul>
+    <blockquote class="pres-quote">
+      « Faire des JOJ un moment qui résonne au-delà des sites officiels, non pas en déplaçant les Jeux, mais en
+      prolongeant leur esprit dans les pratiques, les récits et la fierté collective des communautés. »
+    </blockquote>
+  </section>
+
+  <div class="pres-footer">
+    <a class="placeholder-back" href="index.html">← Retour au hub</a>
+  </div>
+
+</main>
+
+<div id="docModal" class="doc-modal" onclick="fermerApercu(event)">
+  <div class="doc-modal-content">
+    <div class="doc-modal-header">
+      <span id="docModalTitle">Aperçu</span>
+      <button class="doc-modal-close" onclick="fermerApercu()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="doc-modal-body">
+      <iframe id="docModalFrame" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+function ouvrirApercu(type) {
+  const base = window.location.href.split('?')[0].split('#')[0].replace(/[^/]+$/, '');
+  const configs = {
+    note: {
+      title: 'Note conceptuelle JO\'TALI',
+      src: base + 'documents/Note_conceptuelle_JOTALI.pdf'
+    },
+    pitchfr: {
+      title: 'Pitch de présentation (FR)',
+      src: base + 'documents/Pitch_JOTALI_FR.pdf'
+    },
+    pitchen: {
+      title: 'Pitch de présentation (EN)',
+      src: base + 'documents/Pitch_JOTALI_EN.pdf'
+    }
+  };
+  const doc = configs[type];
+  if (!doc) return;
+  document.getElementById('docModalTitle').textContent = doc.title;
+  document.getElementById('docModalFrame').src = doc.src;
+  document.getElementById('docModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function fermerApercu(e) {
+  if (e && e.target !== document.getElementById('docModal')) return;
+  document.getElementById('docModal').classList.remove('open');
+  document.getElementById('docModalFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fermerApercu();
+});
+</script>
+
+</body>
+</html>
