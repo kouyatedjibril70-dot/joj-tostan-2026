@@ -89,4 +89,3 @@ Puis ouvrir `http://localhost:8080`
 
 ## 👤 Auteur
 Djibril · Géomaticien / Data Analyst · Dakar, Sénégal
-<!-- Test du 8 juillet 2026 -->
