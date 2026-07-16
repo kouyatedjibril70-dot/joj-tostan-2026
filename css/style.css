@@ -1107,8 +1107,8 @@ body.anim-done #map {
 
 
 /* ═══════════════════════════════════════════════════════
-   HUB — IDENTITÉ PARTAGÉE ENTRE LES 3 ESPACES
-   (utilisé par presentation.html, selection.html, planification.html)
+   HUB — IDENTITÉ PARTAGÉE
+   (utilisé par selection.html)
 ════════════════════════════════════════════════════════ */
 .app-header.brand-forest {
   background: linear-gradient(135deg, var(--forest) 0%, var(--forest2) 55%, var(--forest3) 100%);
