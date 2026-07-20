@@ -51,7 +51,10 @@ function setRayonChip(btn, value, inputId) {
   console.log('[setRayonChip]', inputId, '=', value);
 }
 
+let currentSpatialMode = 'global';
+
 function switchSpatialMode(mode, btn) {
+  currentSpatialMode = mode;
   document.querySelectorAll('.spatial-mode-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   document.querySelectorAll('.spatial-panel').forEach(p => p.style.display = 'none');
@@ -67,10 +70,29 @@ function switchSpatialMode(mode, btn) {
   }
 }
 
+/* ── Rafraîchir les textes traduits (changement de langue) ──── */
+function refreshSpatialI18n() {
+  if (!spatialBuilt) return;
+  switch (currentSpatialMode) {
+    case 'rayon':
+      if (document.getElementById('spatialCommuneSelect').value) lancerRechercheRayon();
+      break;
+    case 'comparer':
+      if (document.getElementById('compareA').value && document.getElementById('compareB').value) lancerComparaison();
+      break;
+    case 'isolees':
+      lancerAnalyseIsolees();
+      break;
+    default:
+      lancerAnalyseGlobale();
+  }
+}
+
 const SPATIAL_ZONE_COLORS = { 1: '#27AE60', 2: '#E74C3C', 3: '#2980B9' };
 
 /* MODE 1 : RECHERCHE PAR RAYON */
 function genererAnalyseRayon(ref, voisines, rayon) {
+  const isEn = getLang() === 'en';
   const nb = voisines.length;
   const voisinesReelles = voisines.filter(v => v.distance > 0);
   const distMoy = voisinesReelles.length > 0
@@ -82,45 +104,66 @@ function genererAnalyseRayon(ref, voisines, rayon) {
   let niveau, badge, verdict;
   if (nb === 0) {
     niveau = 'isole'; badge = '🔴';
-    verdict = `Aucune autre communauté n'est accessible dans un rayon de ${rayon} km. ${ref.nom} est isolée à cette distance — augmentez le rayon ou choisissez une communauté mieux centrée.`;
+    verdict = isEn
+      ? `No other community is reachable within a ${rayon} km radius. ${ref.nom} is isolated at this distance — increase the radius or choose a more central community.`
+      : `Aucune autre communauté n'est accessible dans un rayon de ${rayon} km. ${ref.nom} est isolée à cette distance — augmentez le rayon ou choisissez une communauté mieux centrée.`;
   } else if (nb >= 20) {
     niveau = 'excellent'; badge = '🟢';
-    verdict = `Excellent point de regroupement.`;
+    verdict = isEn ? `Excellent gathering point.` : `Excellent point de regroupement.`;
   } else if (nb >= 12) {
     niveau = 'bon'; badge = '🟢';
-    verdict = `Bon point de regroupement.`;
+    verdict = isEn ? `Good gathering point.` : `Bon point de regroupement.`;
   } else if (nb >= 5) {
     niveau = 'moyen'; badge = '🟡';
-    verdict = `Point de regroupement convenable.`;
+    verdict = isEn ? `Decent gathering point.` : `Point de regroupement convenable.`;
   } else {
     niveau = 'faible'; badge = '🟠';
-    verdict = `Point de regroupement limité.`;
+    verdict = isEn ? `Limited gathering point.` : `Point de regroupement limité.`;
   }
 
   let txt = '';
   if (nb > 0) {
-    txt += `${ref.nom} peut rassembler <strong>${nb} communauté${nb > 1 ? 's' : ''}</strong> dans un rayon de ${rayon} km, soit <strong>${(voisines.reduce((s,v)=>s+v.jeunes,0)+ref.jeunes).toLocaleString('fr-FR')} jeunes</strong> 15-35 ans. `;
+    const jeunesTotal = fmtNum(voisines.reduce((s,v)=>s+v.jeunes,0)+ref.jeunes);
+    txt += isEn
+      ? `${ref.nom} can bring together <strong>${nb} ${nb > 1 ? 'communities' : 'community'}</strong> within a ${rayon} km radius, i.e. <strong>${jeunesTotal} youth</strong> aged 15-35. `
+      : `${ref.nom} peut rassembler <strong>${nb} communauté${nb > 1 ? 's' : ''}</strong> dans un rayon de ${rayon} km, soit <strong>${jeunesTotal} jeunes</strong> 15-35 ans. `;
 
     if (distMoy > 0) {
-      txt += `La distance moyenne de <strong>${distMoy.toFixed(1)} km</strong> (≈ ${tpsMoy} min de trajet) est `;
-      txt += distMoy < 10 ? 'très favorable pour la mobilisation. '
-           : distMoy < 20 ? 'compatible avec une mobilisation en journée. '
-           : 'élevée et peut représenter une contrainte logistique. ';
+      txt += isEn
+        ? `The average distance of <strong>${distMoy.toFixed(1)} km</strong> (≈ ${tpsMoy} min travel) is `
+        : `La distance moyenne de <strong>${distMoy.toFixed(1)} km</strong> (≈ ${tpsMoy} min de trajet) est `;
+      if (isEn) {
+        txt += distMoy < 10 ? 'very favorable for mobilization. '
+             : distMoy < 20 ? 'compatible with a single-day mobilization. '
+             : 'high and may represent a logistical constraint. ';
+      } else {
+        txt += distMoy < 10 ? 'très favorable pour la mobilisation. '
+             : distMoy < 20 ? 'compatible avec une mobilisation en journée. '
+             : 'élevée et peut représenter une contrainte logistique. ';
+      }
     }
 
     const atouts = [];
-    if (ref.statut === 'EN COURS') atouts.push('un programme PRCC actif');
-    if (ref.rpp === 'Oui') atouts.push('un programme RPP');
-    if (ref.ps === 'Oui') atouts.push('le programme P&S');
-    if (atouts.length > 0)
-      txt += `La communauté dispose de ${atouts.join(', ')}, ce qui facilite l'organisation des activités. `;
+    if (isEn) {
+      if (ref.statut === 'EN COURS') atouts.push('an active PRCC program');
+      if (ref.rpp === 'Oui') atouts.push('an RPP program');
+      if (ref.ps === 'Oui') atouts.push('the P&S program');
+      if (atouts.length > 0)
+        txt += `The community has ${atouts.join(', ')}, which facilitates organizing activities. `;
+    } else {
+      if (ref.statut === 'EN COURS') atouts.push('un programme PRCC actif');
+      if (ref.rpp === 'Oui') atouts.push('un programme RPP');
+      if (ref.ps === 'Oui') atouts.push('le programme P&S');
+      if (atouts.length > 0)
+        txt += `La communauté dispose de ${atouts.join(', ')}, ce qui facilite l'organisation des activités. `;
+    }
 
     if (niveau === 'excellent' || niveau === 'bon')
-      txt += '✅ Ce site est recommandé comme point de rassemblement prioritaire.';
+      txt += isEn ? '✅ This site is recommended as a priority gathering point.' : '✅ Ce site est recommandé comme point de rassemblement prioritaire.';
     else if (niveau === 'moyen')
-      txt += '⚠️ Ce site est acceptable — augmenter le rayon améliorerait la couverture.';
+      txt += isEn ? '⚠️ This site is acceptable — increasing the radius would improve coverage.' : '⚠️ Ce site est acceptable — augmenter le rayon améliorerait la couverture.';
     else
-      txt += '❌ Couverture faible pour ce rayon. Envisagez un rayon plus large ou une autre communauté.';
+      txt += isEn ? '❌ Low coverage for this radius. Consider a wider radius or another community.' : '❌ Couverture faible pour ce rayon. Envisagez un rayon plus large ou une autre communauté.';
   } else {
     txt = verdict;
   }
@@ -133,7 +176,7 @@ function lancerRechercheRayon() {
   const rayon = parseInt(document.getElementById('spatialRayon').value);
   if (!sel.value) {
     document.getElementById('spatialResults').innerHTML =
-      '<div class="spatial-empty">Sélectionnez une communauté de référence.</div>';
+      `<div class="spatial-empty">${t('spatial.select_ref')}</div>`;
     return;
   }
   const [nom, lat] = sel.value.split('|');
@@ -157,7 +200,7 @@ function lancerRechercheRayon() {
       html: `<div style="width:18px;height:18px;border-radius:50%;background:#F39C12;border:3px solid #fff;box-shadow:0 0 10px #F39C12"></div>`,
       iconSize: [18, 18], iconAnchor: [9, 9], className: ''
     })
-  }).bindPopup(`<b>${ref.nom}</b><br>Communauté de référence`).addTo(spatialLayer);
+  }).bindPopup(`<b>${ref.nom}</b><br>${t('spatial.ref_tag')}`).addTo(spatialLayer);
 
   voisines.forEach(v => {
     L.marker([v.lat, v.lng], {
@@ -170,20 +213,20 @@ function lancerRechercheRayon() {
 
   document.getElementById('spatialResults').innerHTML = `
     <div class="spatial-summary">
-      <div class="ss-item"><div class="ss-val">${voisines.length}</div><div class="ss-lbl">Communautés dans ${rayon} km</div></div>
-      <div class="ss-item"><div class="ss-val">${jeunesTotal.toLocaleString('fr-FR')}</div><div class="ss-lbl">Jeunes 15-35 couverts</div></div>
-      <div class="ss-item"><div class="ss-val">${voisines.length > 0 ? (voisines.reduce((s,v)=>s+v.distance,0)/voisines.length).toFixed(1) : 0} km</div><div class="ss-lbl">Distance moyenne</div></div>
-      <div class="ss-item"><div class="ss-val">${voisines.length > 0 ? estimerTempsTrajet(voisines.reduce((s,v)=>s+v.distance,0)/voisines.length) : 0} min</div><div class="ss-lbl">Trajet moyen estimé</div></div>
+      <div class="ss-item"><div class="ss-val">${voisines.length}</div><div class="ss-lbl">${t('spatial.ss_comm_dans', { r: rayon })}</div></div>
+      <div class="ss-item"><div class="ss-val">${fmtNum(jeunesTotal)}</div><div class="ss-lbl">${t('spatial.ss_jeunes_couverts')}</div></div>
+      <div class="ss-item"><div class="ss-val">${voisines.length > 0 ? (voisines.reduce((s,v)=>s+v.distance,0)/voisines.length).toFixed(1) : 0} km</div><div class="ss-lbl">${t('spatial.ss_dist_moy')}</div></div>
+      <div class="ss-item"><div class="ss-val">${voisines.length > 0 ? estimerTempsTrajet(voisines.reduce((s,v)=>s+v.distance,0)/voisines.length) : 0} min</div><div class="ss-lbl">${t('spatial.ss_trajet_moy')}</div></div>
     </div>
     <div class="rayon-analyse rayon-analyse--${analyseRayon.niveau}">
       <div class="rayon-analyse-badge">${analyseRayon.badge}</div>
       <div class="rayon-analyse-body">
-        <div class="rayon-analyse-titre">Analyse du point de regroupement</div>
+        <div class="rayon-analyse-titre">${t('spatial.title_analysis')}</div>
         <p class="rayon-analyse-txt">${analyseRayon.txt}</p>
       </div>
     </div>
     <table class="spatial-table">
-      <thead><tr><th>Communauté</th><th>Zone</th><th>Distance</th><th>Trajet</th><th>Jeunes</th><th>PRCC</th></tr></thead>
+      <thead><tr><th>${t('spatial.th_communaute')}</th><th>${t('spatial.th_zone')}</th><th>${t('spatial.th_distance')}</th><th>${t('spatial.th_trajet')}</th><th>${t('spatial.th_jeunes')}</th><th>${t('spatial.th_prcc')}</th></tr></thead>
       <tbody>
         ${voisines.map(v => `
           <tr>
@@ -191,7 +234,7 @@ function lancerRechercheRayon() {
             <td><span class="zone-tag zt${v.zone_id}">Z${v.zone_id}</span></td>
             <td>${v.distance} km</td>
             <td>${v.temps_trajet} min</td>
-            <td>${v.jeunes.toLocaleString('fr-FR')}</td>
+            <td>${fmtNum(v.jeunes)}</td>
             <td>${v.statut === 'EN COURS' ? '🟣' : '—'}</td>
           </tr>`).join('')}
       </tbody>
@@ -201,57 +244,96 @@ function lancerRechercheRayon() {
 
 /* MODE 3 : COMPARATEUR */
 function genererAnalyseComparaison(a, b, rayon, winner) {
+  const isEn = getLang() === 'en';
   const W = winner === 'a' ? a : winner === 'b' ? b : null;
   const L = winner === 'a' ? b : winner === 'b' ? a : null;
 
   let txt = '';
 
   if (!winner) {
-    txt += `<strong>${a.communaute.nom}</strong> et <strong>${b.communaute.nom}</strong> sont équivalentes sur l'ensemble des critères pour un rayon de ${rayon} km. `;
-    txt += `Elles couvrent respectivement ${a.nbCouvertes} et ${b.nbCouvertes} communautés. `;
-    txt += `Dans ce cas, privilégiez la communauté disposant du meilleur statut PRCC ou du plus grand nombre de jeunes sur place.`;
+    if (isEn) {
+      txt += `<strong>${a.communaute.nom}</strong> and <strong>${b.communaute.nom}</strong> are equivalent on all criteria for a ${rayon} km radius. `;
+      txt += `They respectively cover ${a.nbCouvertes} and ${b.nbCouvertes} communities. `;
+      txt += `In this case, favor the community with the better PRCC status or the larger number of youth on site.`;
+    } else {
+      txt += `<strong>${a.communaute.nom}</strong> et <strong>${b.communaute.nom}</strong> sont équivalentes sur l'ensemble des critères pour un rayon de ${rayon} km. `;
+      txt += `Elles couvrent respectivement ${a.nbCouvertes} et ${b.nbCouvertes} communautés. `;
+      txt += `Dans ce cas, privilégiez la communauté disposant du meilleur statut PRCC ou du plus grand nombre de jeunes sur place.`;
+    }
     return txt;
   }
 
   // Gagnante
   const diffIndice = Math.abs(a.indice - b.indice);
-  const ecart = diffIndice >= 20 ? 'nettement supérieure' : diffIndice >= 10 ? 'supérieure' : 'légèrement supérieure';
-  txt += `<strong>${W.communaute.nom}</strong> est ${ecart} à <strong>${L.communaute.nom}</strong> avec un indice de ${W.indice}/100 contre ${L.indice}/100. `;
+  if (isEn) {
+    const ecart = diffIndice >= 20 ? 'clearly higher' : diffIndice >= 10 ? 'higher' : 'slightly higher';
+    txt += `<strong>${W.communaute.nom}</strong> is ${ecart} than <strong>${L.communaute.nom}</strong> with a centrality index of ${W.indice}/100 versus ${L.indice}/100. `;
+  } else {
+    const ecart = diffIndice >= 20 ? 'nettement supérieure' : diffIndice >= 10 ? 'supérieure' : 'légèrement supérieure';
+    txt += `<strong>${W.communaute.nom}</strong> est ${ecart} à <strong>${L.communaute.nom}</strong> avec un indice de ${W.indice}/100 contre ${L.indice}/100. `;
+  }
 
   // Couverture
   if (W.nbCouvertes !== L.nbCouvertes) {
     const diffComm = W.nbCouvertes - L.nbCouvertes;
-    txt += `Elle couvre ${diffComm > 0 ? diffComm + ' communauté' + (diffComm > 1 ? 's' : '') + ' de plus' : 'autant de communautés'} (${W.nbCouvertes} vs ${L.nbCouvertes}), `;
-    txt += `soit ${(W.jeunesCouverts - L.jeunesCouverts) > 0 ? (W.jeunesCouverts - L.jeunesCouverts).toLocaleString('fr-FR') + ' jeunes supplémentaires' : 'un nombre comparable de jeunes'}. `;
+    const diffJeunes = W.jeunesCouverts - L.jeunesCouverts;
+    if (isEn) {
+      txt += `It covers ${diffComm > 0 ? diffComm + ' more ' + (diffComm > 1 ? 'communities' : 'community') : 'as many communities'} (${W.nbCouvertes} vs ${L.nbCouvertes}), `;
+      txt += `i.e. ${diffJeunes > 0 ? fmtNum(diffJeunes) + ' additional youth' : 'a comparable number of youth'}. `;
+    } else {
+      txt += `Elle couvre ${diffComm > 0 ? diffComm + ' communauté' + (diffComm > 1 ? 's' : '') + ' de plus' : 'autant de communautés'} (${W.nbCouvertes} vs ${L.nbCouvertes}), `;
+      txt += `soit ${diffJeunes > 0 ? fmtNum(diffJeunes) + ' jeunes supplémentaires' : 'un nombre comparable de jeunes'}. `;
+    }
   } else {
-    txt += `Elles couvrent le même nombre de communautés (${W.nbCouvertes}), mais ${W.communaute.nom} l'emporte sur d'autres critères. `;
+    txt += isEn
+      ? `They cover the same number of communities (${W.nbCouvertes}), but ${W.communaute.nom} wins on other criteria. `
+      : `Elles couvrent le même nombre de communautés (${W.nbCouvertes}), mais ${W.communaute.nom} l'emporte sur d'autres critères. `;
   }
 
   // Distance
   if (W.distMoyenne !== L.distMoyenne && W.distMoyenne > 0 && L.distMoyenne > 0) {
     if (W.distMoyenne < L.distMoyenne) {
-      txt += `Sa distance moyenne plus faible (${W.distMoyenne} km vs ${L.distMoyenne} km) réduit les coûts et le temps de déplacement. `;
+      txt += isEn
+        ? `Its lower average distance (${W.distMoyenne} km vs ${L.distMoyenne} km) reduces travel cost and time. `
+        : `Sa distance moyenne plus faible (${W.distMoyenne} km vs ${L.distMoyenne} km) réduit les coûts et le temps de déplacement. `;
     } else {
-      txt += `Bien que sa distance moyenne soit plus élevée (${W.distMoyenne} km vs ${L.distMoyenne} km), ses autres avantages compensent. `;
+      txt += isEn
+        ? `Although its average distance is higher (${W.distMoyenne} km vs ${L.distMoyenne} km), its other advantages compensate. `
+        : `Bien que sa distance moyenne soit plus élevée (${W.distMoyenne} km vs ${L.distMoyenne} km), ses autres avantages compensent. `;
     }
   }
 
   // Atouts PRCC
   const atotsW = [], atotsL = [];
-  if (W.communaute.statut === 'EN COURS') atotsW.push('PRCC en cours');
-  if (W.communaute.rpp === 'Oui') atotsW.push('RPP');
-  if (W.communaute.ps === 'Oui') atotsW.push('P&S');
-  if (L.communaute.statut === 'EN COURS') atotsL.push('PRCC en cours');
-  if (L.communaute.rpp === 'Oui') atotsL.push('RPP');
-  if (L.communaute.ps === 'Oui') atotsL.push('P&S');
-
-  if (atotsW.length > atotsL.length) {
-    txt += `${W.communaute.nom} dispose également de plus de programmes actifs (${atotsW.join(', ')}), un atout pour la mobilisation. `;
-  } else if (atotsW.length > 0) {
-    txt += `La présence de ${atotsW.join(', ')} est un atout pour l'organisation des activités. `;
+  if (isEn) {
+    if (W.communaute.statut === 'EN COURS') atotsW.push('ongoing PRCC');
+    if (W.communaute.rpp === 'Oui') atotsW.push('RPP');
+    if (W.communaute.ps === 'Oui') atotsW.push('P&S');
+    if (L.communaute.statut === 'EN COURS') atotsL.push('ongoing PRCC');
+    if (L.communaute.rpp === 'Oui') atotsL.push('RPP');
+    if (L.communaute.ps === 'Oui') atotsL.push('P&S');
+  } else {
+    if (W.communaute.statut === 'EN COURS') atotsW.push('PRCC en cours');
+    if (W.communaute.rpp === 'Oui') atotsW.push('RPP');
+    if (W.communaute.ps === 'Oui') atotsW.push('P&S');
+    if (L.communaute.statut === 'EN COURS') atotsL.push('PRCC en cours');
+    if (L.communaute.rpp === 'Oui') atotsL.push('RPP');
+    if (L.communaute.ps === 'Oui') atotsL.push('P&S');
   }
 
-  txt += `✅ <strong>${W.communaute.nom}</strong> est la communauté recommandée pour organiser un événement JO'TALI dans cette zone.`;
+  if (atotsW.length > atotsL.length) {
+    txt += isEn
+      ? `${W.communaute.nom} also has more active programs (${atotsW.join(', ')}), an asset for mobilization. `
+      : `${W.communaute.nom} dispose également de plus de programmes actifs (${atotsW.join(', ')}), un atout pour la mobilisation. `;
+  } else if (atotsW.length > 0) {
+    txt += isEn
+      ? `The presence of ${atotsW.join(', ')} is an asset for organizing activities. `
+      : `La présence de ${atotsW.join(', ')} est un atout pour l'organisation des activités. `;
+  }
+
+  txt += isEn
+    ? `✅ <strong>${W.communaute.nom}</strong> is the recommended community for hosting a JO'TALI event in this area.`
+    : `✅ <strong>${W.communaute.nom}</strong> est la communauté recommandée pour organiser un événement JO'TALI dans cette zone.`;
   return txt;
 }
 
@@ -262,12 +344,12 @@ function lancerComparaison() {
 
   if (!nomA || !nomB) {
     document.getElementById('spatialResults').innerHTML =
-      '<div class="spatial-empty">Sélectionnez deux communautés à comparer.</div>';
+      `<div class="spatial-empty">${t('spatial.select_two')}</div>`;
     return;
   }
   if (nomA === nomB) {
     document.getElementById('spatialResults').innerHTML =
-      '<div class="spatial-empty">Choisissez deux communautés différentes.</div>';
+      `<div class="spatial-empty">${t('spatial.select_different')}</div>`;
     return;
   }
 
@@ -293,13 +375,14 @@ function lancerComparaison() {
     }).bindPopup(`<b>${d.communaute.nom}</b>`).addTo(spatialLayer);
   });
 
+  const isEn = getLang() === 'en';
   const rows = [
-    ['Communautés couvertes', a.nbCouvertes, b.nbCouvertes, a.nbCouvertes, b.nbCouvertes, 'higher'],
-    ['Jeunes 15-35 couverts', a.jeunesCouverts.toLocaleString('fr-FR'), b.jeunesCouverts.toLocaleString('fr-FR'), a.jeunesCouverts, b.jeunesCouverts, 'higher'],
-    ['Distance moyenne', a.distMoyenne + ' km', b.distMoyenne + ' km', a.distMoyenne, b.distMoyenne, 'lower'],
-    ['Trajet moyen estimé', a.tempsTrajetMoyen + ' min', b.tempsTrajetMoyen + ' min', a.tempsTrajetMoyen, b.tempsTrajetMoyen, 'lower'],
-    ['Statut PRCC', a.communaute.statut, b.communaute.statut, 0, 0, 'none'],
-    ['Indice de centralité', a.indice + '/100', b.indice + '/100', a.indice, b.indice, 'higher']
+    [isEn ? 'Communities covered' : 'Communautés couvertes', a.nbCouvertes, b.nbCouvertes, a.nbCouvertes, b.nbCouvertes, 'higher'],
+    [isEn ? 'Youth 15-35 covered' : 'Jeunes 15-35 couverts', fmtNum(a.jeunesCouverts), fmtNum(b.jeunesCouverts), a.jeunesCouverts, b.jeunesCouverts, 'higher'],
+    [isEn ? 'Average distance' : 'Distance moyenne', a.distMoyenne + ' km', b.distMoyenne + ' km', a.distMoyenne, b.distMoyenne, 'lower'],
+    [isEn ? 'Estimated average travel time' : 'Trajet moyen estimé', a.tempsTrajetMoyen + ' min', b.tempsTrajetMoyen + ' min', a.tempsTrajetMoyen, b.tempsTrajetMoyen, 'lower'],
+    [isEn ? 'PRCC status' : 'Statut PRCC', trStatut(a.communaute.statut), trStatut(b.communaute.statut), 0, 0, 'none'],
+    [isEn ? 'Centrality index' : 'Indice de centralité', a.indice + '/100', b.indice + '/100', a.indice, b.indice, 'higher']
   ];
 
   document.getElementById('spatialResults').innerHTML = `
@@ -321,23 +404,25 @@ function lancerComparaison() {
       }).join('')}
     </table>
     <div class="compare-verdict">
-      ${winner ? `<b>${(winner==='a'?a:b).communaute.nom}</b> a l'indice de centralité le plus élevé pour ce rayon.` : 'Les deux communautés sont équivalentes.'}
+      ${winner ? `<b>${(winner==='a'?a:b).communaute.nom}</b> ${isEn ? 'has the highest centrality index for this radius.' : "a l'indice de centralité le plus élevé pour ce rayon."}` : t('spatial.equivalentes')}
     </div>
     <div class="compare-analyse">
-      <div class="compare-analyse-titre">💡 Analyse comparative</div>
+      <div class="compare-analyse-titre">${t('spatial.title_compare_analysis')}</div>
       <p class="compare-analyse-txt">${analyseCompare}</p>
     </div>`;
 }
 
 /* MODE 4 : COMMUNAUTÉS ISOLÉES */
 function lancerAnalyseIsolees() {
+  const isEn = getLang() === 'en';
   const seuil = parseInt(document.getElementById('isoleesSeuil').value);
   const isolees = trouverCommunautesIsolees(seuil);
 
   spatialLayer.clearLayers();
   if (isolees.length === 0) {
-    document.getElementById('spatialResults').innerHTML =
-      `<div class="spatial-empty">Aucune communauté isolée au-delà de ${seuil} km. Le réseau est bien couvert.</div>`;
+    document.getElementById('spatialResults').innerHTML = isEn
+      ? `<div class="spatial-empty">No community is isolated beyond ${seuil} km. The network is well covered.</div>`
+      : `<div class="spatial-empty">Aucune communauté isolée au-delà de ${seuil} km. Le réseau est bien couvert.</div>`;
     return;
   }
 
@@ -348,16 +433,16 @@ function lancerAnalyseIsolees() {
         html: `<div style="width:14px;height:14px;border-radius:50%;background:#E74C3C;border:2px solid #fff;box-shadow:0 0 8px #E74C3C"></div>`,
         iconSize: [14, 14], iconAnchor: [7, 7], className: ''
       })
-    }).bindPopup(`<b>${r.communaute.nom}</b><br>Voisine la plus proche : ${r.distancePlusProcheVoisine} km`).addTo(spatialLayer);
+    }).bindPopup(`<b>${r.communaute.nom}</b><br>${isEn ? 'Nearest neighbor' : 'Voisine la plus proche'} : ${r.distancePlusProcheVoisine} km`).addTo(spatialLayer);
   });
 
   document.getElementById('spatialResults').innerHTML = `
     <div class="spatial-summary">
-      <div class="ss-item"><div class="ss-val" style="color:#E74C3C">${isolees.length}</div><div class="ss-lbl">Communautés isolées (> ${seuil} km)</div></div>
-      <div class="ss-item"><div class="ss-val">${isolees[0].distancePlusProcheVoisine} km</div><div class="ss-lbl">Isolement maximum</div></div>
+      <div class="ss-item"><div class="ss-val" style="color:#E74C3C">${isolees.length}</div><div class="ss-lbl">${t('spatial.ss_comm_isolees', { s: seuil })}</div></div>
+      <div class="ss-item"><div class="ss-val">${isolees[0].distancePlusProcheVoisine} km</div><div class="ss-lbl">${t('spatial.ss_isolement_max')}</div></div>
     </div>
     <table class="spatial-table">
-      <thead><tr><th>Communauté</th><th>Zone</th><th>Région</th><th>Voisine la + proche</th><th>Jeunes</th></tr></thead>
+      <thead><tr><th>${t('spatial.th_communaute')}</th><th>${t('spatial.th_zone')}</th><th>${t('spatial.th_region')}</th><th>${t('spatial.th_voisine')}</th><th>${t('spatial.th_jeunes')}</th></tr></thead>
       <tbody>
         ${isolees.map(r => `
           <tr>
@@ -365,7 +450,7 @@ function lancerAnalyseIsolees() {
             <td><span class="zone-tag zt${r.communaute.zone_id}">Z${r.communaute.zone_id}</span></td>
             <td>${r.communaute.region}</td>
             <td style="color:#E74C3C;font-weight:700">${r.distancePlusProcheVoisine} km</td>
-            <td>${r.communaute.jeunes.toLocaleString('fr-FR')}</td>
+            <td>${fmtNum(r.communaute.jeunes)}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -373,6 +458,7 @@ function lancerAnalyseIsolees() {
 
 /* VUE GLOBALE PAR DÉFAUT */
 function renderStatsGlobales() {
+  const isEn = getLang() === 'en';
   spatialLayer.clearLayers();
   spatialMap.setView([13.8, -14.2], 7);
 
@@ -381,7 +467,7 @@ function renderStatsGlobales() {
       radius: 6, color: '#fff', weight: 1.5,
       fillColor: SPATIAL_ZONE_COLORS[d.zone_id], fillOpacity: .85
     })
-    .bindPopup(`<b>${d.nom}</b><br>${d.region} · Zone ${d.zone_id}<br>${d.jeunes.toLocaleString('fr-FR')} jeunes · Score ${d.score_total}/100`)
+    .bindPopup(`<b>${d.nom}</b><br>${d.region} · Zone ${d.zone_id}<br>${fmtNum(d.jeunes)} ${t('common.jeunes_word')} · Score ${d.score_total}/100`)
     .addTo(spatialLayer);
   });
 
@@ -390,14 +476,14 @@ function renderStatsGlobales() {
   const TOTAL_JEUNES = JOJ_DATA.reduce((s, d) => s + d.jeunes, 0);
 
   const TRANCHES = [
-    { val: '0-200',      label: 'moins de 200 jeunes',    min: 0,    max: 199 },
-    { val: '200-500',    label: 'entre 200 et 499 jeunes', min: 200,  max: 499 },
-    { val: '500-1000',   label: 'entre 500 et 999 jeunes', min: 500,  max: 999 },
-    { val: '1000-99999', label: '1 000 jeunes ou plus',    min: 1000, max: 99999 }
-  ].map(t => {
-    const comm = JOJ_DATA.filter(d => d.jeunes >= t.min && d.jeunes <= t.max);
+    { val: '0-200',      label: t('spatial.tranche_0_200'),    min: 0,    max: 199 },
+    { val: '200-500',    label: t('spatial.tranche_200_500'),  min: 200,  max: 499 },
+    { val: '500-1000',   label: t('spatial.tranche_500_1000'), min: 500,  max: 999 },
+    { val: '1000-99999', label: t('spatial.tranche_1000_plus'),min: 1000, max: 99999 }
+  ].map(tr => {
+    const comm = JOJ_DATA.filter(d => d.jeunes >= tr.min && d.jeunes <= tr.max);
     const jeunes = comm.reduce((s, d) => s + d.jeunes, 0);
-    return { ...t, comm: comm.length, jeunes, pctComm: ((comm.length / TOTAL_COMM) * 100).toFixed(1), pctJeunes: ((jeunes / TOTAL_JEUNES) * 100).toFixed(1) };
+    return { ...tr, comm: comm.length, jeunes, pctComm: ((comm.length / TOTAL_COMM) * 100).toFixed(1), pctJeunes: ((jeunes / TOTAL_JEUNES) * 100).toFixed(1) };
   });
 
   const ZONES = [
@@ -413,14 +499,27 @@ function renderStatsGlobales() {
 
   const zoneMaxJeunes = ZONES.reduce((a, b) => b.moy > a.moy ? b : a);
   const trancheMaj    = TRANCHES.reduce((a, b) => b.comm > a.comm ? b : a);
-  const trancheMin    = TRANCHES[0]; // moins de 200
-  const trancheForte  = TRANCHES[3]; // 1000+
 
   const moyGlobale = Math.round(TOTAL_JEUNES / TOTAL_COMM);
 
   // ── Analyse narrative ─────────────────────────────────────
-  const narratif = `
-Sur les <strong>${TOTAL_COMM} communautés pilotes</strong> JO'TALI × Tostan 2026, le programme touche un total de <strong>${TOTAL_JEUNES.toLocaleString('fr-FR')} jeunes 15-35 ans</strong>, soit une moyenne de <strong>${moyGlobale} jeunes par communauté</strong>.
+  const narratif = isEn ? `
+Across the <strong>${TOTAL_COMM} pilot communities</strong> of JO'TALI × Tostan 2026, the program reaches a total of <strong>${fmtNum(TOTAL_JEUNES)} youth aged 15-35</strong>, i.e. an average of <strong>${moyGlobale} youth per community</strong>.
+
+The breakdown by bracket reveals a significant concentration in the middle categories:
+<ul style="margin:8px 0 8px 18px;line-height:2">
+  <li><strong>${TRANCHES[0].comm} communities (${TRANCHES[0].pctComm} %)</strong> have <em>fewer than 200 youth</em> — these are often peripheral or isolated villages, with limited mobilization potential but real symbolic importance for territorial inclusion.</li>
+  <li><strong>${TRANCHES[1].comm} communities (${TRANCHES[1].pctComm} %)</strong> fall <em>between 200 and 499 youth</em> — they form the program's intermediate backbone, ideal for human-scale local events.</li>
+  <li><strong>${TRANCHES[2].comm} communities (${TRANCHES[2].pctComm} %)</strong> gather <em>between 500 and 999 youth</em> — their mobilization capacity makes them priority sites for zone-wide activities.</li>
+  <li><strong>${TRANCHES[3].comm} communities (${TRANCHES[3].pctComm} %)</strong> exceed <em>1,000 youth</em> — concentrating alone <strong>${TRANCHES[3].pctJeunes} % of youth</strong> in the program, they represent the most powerful mobilization levers.</li>
+</ul>
+
+The dominant bracket is <strong>${trancheMaj.label}</strong> with <strong>${trancheMaj.comm} communities</strong>, reflecting a demographic structure typical of Sahelian rural areas where mid-sized villages are the most numerous.
+
+Territorially, <strong>${zoneMaxJeunes.label}</strong> has the highest average with <strong>${zoneMaxJeunes.moy} youth per community</strong> on average, versus ${ZONES.filter(z => z.id !== zoneMaxJeunes.id).map(z => `${z.moy} in ${z.shortLabel}`).join(' and ')}. This disparity reflects differences in population density between the covered regions.
+
+Select a bracket above to explore the geographic breakdown in detail and identify the communities concerned.` : `
+Sur les <strong>${TOTAL_COMM} communautés pilotes</strong> JO'TALI × Tostan 2026, le programme touche un total de <strong>${fmtNum(TOTAL_JEUNES)} jeunes 15-35 ans</strong>, soit une moyenne de <strong>${moyGlobale} jeunes par communauté</strong>.
 
 La répartition par tranche révèle une concentration importante dans les catégories moyennes :
 <ul style="margin:8px 0 8px 18px;line-height:2">
@@ -437,14 +536,14 @@ Du point de vue territorial, <strong>${zoneMaxJeunes.label}</strong> présente l
 Sélectionnez une tranche ci-dessus pour explorer en détail la répartition géographique et identifier les communautés concernées.`;
 
   document.getElementById('spatialResults').innerHTML = `
-    <div class="spatial-section-title">🧭 Analyse de la répartition des jeunes 15-35 ans</div>
+    <div class="spatial-section-title">${t('spatial.section_title_global')}</div>
     <div class="global-narratif">${narratif}</div>
     <div class="tranche-overview">
-      ${TRANCHES.map(t => `
-        <div class="tranche-ov-item" onclick="document.getElementById('globalJeunesFilter').value='${t.val}';lancerAnalyseGlobale()">
-          <div class="tranche-ov-val">${t.comm}</div>
-          <div class="tranche-ov-lbl">${t.label}</div>
-          <div class="tranche-ov-pct">${t.pctComm} % des comm.</div>
+      ${TRANCHES.map(tr => `
+        <div class="tranche-ov-item" onclick="document.getElementById('globalJeunesFilter').value='${tr.val}';lancerAnalyseGlobale()">
+          <div class="tranche-ov-val">${tr.comm}</div>
+          <div class="tranche-ov-lbl">${tr.label}</div>
+          <div class="tranche-ov-pct">${tr.pctComm} ${t('spatial.pct_des_comm')}</div>
         </div>`).join('')}
     </div>`;
 }
@@ -466,20 +565,27 @@ const ZONES_META = [
   { id: 2, label: 'Zone 2 — Tamba & Kédougou', shortLabel: 'Zone 2', color: null },
   { id: 3, label: 'Zone 3 — Matam',             shortLabel: 'Zone 3', color: null }
 ];
-const TRANCHES_META = [
-  { val: '0-200',      min: 0,    max: 199,   label: 'moins de 200 jeunes',     badge: '🔵', titre: 'Petite taille' },
-  { val: '200-500',    min: 200,  max: 499,   label: '200 à 499 jeunes',        badge: '🟦', titre: 'Taille intermédiaire' },
-  { val: '500-1000',   min: 500,  max: 999,   label: '500 à 999 jeunes',        badge: '🟡', titre: 'Fort potentiel' },
-  { val: '1000-99999', min: 1000, max: 99999, label: '1 000 jeunes ou plus',    badge: '🔴', titre: 'Très fort potentiel' }
-];
 
-function _trancheMeta(val) { return TRANCHES_META.find(t => t.val === val) || TRANCHES_META[1]; }
+function getTranchesMeta() {
+  return [
+    { val: '0-200',      min: 0,    max: 199,   label: t('spatial.tranche_0_200'),     badge: '🔵', titre: t('spatial.titre_petite') },
+    { val: '200-500',    min: 200,  max: 499,   label: t('spatial.tranche_200_500'),   badge: '🟦', titre: t('spatial.titre_intermediaire') },
+    { val: '500-1000',   min: 500,  max: 999,   label: t('spatial.tranche_500_1000'),  badge: '🟡', titre: t('spatial.titre_fort') },
+    { val: '1000-99999', min: 1000, max: 99999, label: t('spatial.tranche_1000_plus'), badge: '🔴', titre: t('spatial.titre_tresfort') }
+  ];
+}
+
+function _trancheMeta(val) {
+  const metas = getTranchesMeta();
+  return metas.find(tr => tr.val === val) || metas[1];
+}
 
 /* ── Fonction principale d'analyse ─────────────────────────
    zoneId    : 1|2|3|null  (null = toutes les zones)
    trancheVal: '0-200'|...  (null = toutes les tranches)
 ────────────────────────────────────────────────────────── */
 function _afficherAnalyse(zoneId, trancheVal) {
+  const isEn = getLang() === 'en';
   const TOTAL_COMM   = JOJ_DATA.length;
   const TOTAL_JEUNES = JOJ_DATA.reduce((s, d) => s + d.jeunes, 0);
 
@@ -501,7 +607,7 @@ function _afficherAnalyse(zoneId, trancheVal) {
   if (pool.length === 0) {
     spatialMap.setView([13.8, -14.2], 7);
     document.getElementById('spatialResults').innerHTML =
-      `<div class="spatial-empty">Aucune communauté ne correspond à cette sélection.</div>`;
+      `<div class="spatial-empty">${t('spatial.no_match')}</div>`;
     return;
   }
 
@@ -515,7 +621,7 @@ function _afficherAnalyse(zoneId, trancheVal) {
         fillColor: inPool ? SPATIAL_ZONE_COLORS[d.zone_id] : '#ccc',
         fillOpacity: inPool ? .92 : .3
       })
-      .bindPopup(`<b>${d.nom}</b><br>${d.region} · Zone ${d.zone_id}<br><b>${d.jeunes.toLocaleString('fr-FR')} jeunes</b> · Score ${d.score_total}/100`)
+      .bindPopup(`<b>${d.nom}</b><br>${d.region} · Zone ${d.zone_id}<br><b>${fmtNum(d.jeunes)} ${t('common.jeunes_word')}</b> · Score ${d.score_total}/100`)
       .addTo(spatialLayer);
     });
     spatialMap.fitBounds(pool.map(d => [d.lat, d.lng]), { padding: [50, 50] });
@@ -542,20 +648,26 @@ function _afficherAnalyse(zoneId, trancheVal) {
 
   if (zoneMeta && !trMeta) {
     // MODE : zone seule → vue d'ensemble de la zone par tranche
-    const tranchesZone = TRANCHES_META.map(t => {
-      const comm = basePool.filter(d => d.jeunes >= t.min && d.jeunes <= t.max);
+    const tranchesZone = getTranchesMeta().map(tr => {
+      const comm = basePool.filter(d => d.jeunes >= tr.min && d.jeunes <= tr.max);
       const jeunes = comm.reduce((s, d) => s + d.jeunes, 0);
-      return { ...t, comm: comm.length, jeunes,
+      return { ...tr, comm: comm.length, jeunes,
                pct: ((comm.length / basePool.length) * 100).toFixed(1) };
     });
     const trancheDom = tranchesZone.reduce((a, b) => b.comm > a.comm ? b : a);
     const moyZone = Math.round(baseJeunes / basePool.length);
 
-    narratif = `La <strong>${zoneMeta.label}</strong> regroupe <strong>${basePool.length} communautés</strong> sur les 300 du programme (${((basePool.length / TOTAL_COMM) * 100).toFixed(1)} %), représentant <strong>${baseJeunes.toLocaleString('fr-FR')} jeunes 15-35 ans</strong> avec une moyenne de <strong>${moyZone} jeunes par communauté</strong>.
+    narratif = isEn ? `The <strong>${zoneMeta.label}</strong> groups <strong>${basePool.length} communities</strong> out of the program's 300 (${((basePool.length / TOTAL_COMM) * 100).toFixed(1)} %), representing <strong>${fmtNum(baseJeunes)} youth aged 15-35</strong> with an average of <strong>${moyZone} youth per community</strong>.
+
+The breakdown by youth bracket in this zone is as follows:
+<ul style="margin:8px 0 8px 18px;line-height:2">
+  ${tranchesZone.map(tr => `<li><strong>${tr.comm} communities (${tr.pct} %)</strong> have <em>${tr.label}</em>${tr.comm > 0 ? ` — i.e. ${fmtNum(tr.jeunes)} youth` : ''}</li>`).join('')}
+</ul>
+The dominant bracket is <strong>${trancheDom.label}</strong> with <strong>${trancheDom.comm} communities (${trancheDom.pct} % of the zone)</strong>. To dig deeper, select a bracket in the filter above.` : `La <strong>${zoneMeta.label}</strong> regroupe <strong>${basePool.length} communautés</strong> sur les 300 du programme (${((basePool.length / TOTAL_COMM) * 100).toFixed(1)} %), représentant <strong>${fmtNum(baseJeunes)} jeunes 15-35 ans</strong> avec une moyenne de <strong>${moyZone} jeunes par communauté</strong>.
 
 La répartition par tranche de jeunes dans cette zone est la suivante :
 <ul style="margin:8px 0 8px 18px;line-height:2">
-  ${tranchesZone.map(t => `<li><strong>${t.comm} communautés (${t.pct} %)</strong> comptent <em>${t.label}</em>${t.comm > 0 ? ` — soit ${t.jeunes.toLocaleString('fr-FR')} jeunes` : ''}</li>`).join('')}
+  ${tranchesZone.map(tr => `<li><strong>${tr.comm} communautés (${tr.pct} %)</strong> comptent <em>${tr.label}</em>${tr.comm > 0 ? ` — soit ${fmtNum(tr.jeunes)} jeunes` : ''}</li>`).join('')}
 </ul>
 La tranche dominante est celle des <strong>${trancheDom.label}</strong> avec <strong>${trancheDom.comm} communautés (${trancheDom.pct} % de la zone)</strong>. Pour approfondir l'analyse, sélectionnez une tranche dans le filtre ci-dessus.`;
 
@@ -573,21 +685,31 @@ La tranche dominante est celle des <strong>${trancheDom.label}</strong> avec <st
     const zoneMax = zonesData.reduce((a, b) => b.comm > a.comm ? b : a);
     const zoneMin = zonesData.reduce((a, b) => b.comm < a.comm ? b : a);
 
-    narratif = `Sur les <strong>${TOTAL_COMM} communautés</strong> du programme, <strong>${pool.length} (${pctCommSurTotal} %)</strong> comptent <strong>${trMeta.label}</strong>. Elles représentent <strong>${poolJeunes.toLocaleString('fr-FR')} jeunes</strong> (${pctJeunesSurTotal} % du total), avec une moyenne de <strong>${moyPool} jeunes par communauté</strong> dans cette tranche.
+    narratif = isEn ? `Across the program's <strong>${TOTAL_COMM} communities</strong>, <strong>${pool.length} (${pctCommSurTotal} %)</strong> have <strong>${trMeta.label}</strong>. They represent <strong>${fmtNum(poolJeunes)} youth</strong> (${pctJeunesSurTotal} % of the total), with an average of <strong>${moyPool} youth per community</strong> in this bracket.
+
+Territorially, <strong>${zoneMax.label}</strong> concentrates the largest number of these communities with <strong>${zoneMax.comm} communities</strong> (${zoneMax.pctTranche} % of the bracket, ${zoneMax.pctZone} % of its zone). ${zoneMin.comm === 0 ? `<strong>${zoneMin.label}</strong> has none in this bracket.` : `<strong>${zoneMin.label}</strong> has ${zoneMin.comm} (${zoneMin.pctZone} % of its zone).`}
+
+${_interpretationTranche(trMeta.val, pool.length, pctJeunesSurTotal)}` : `Sur les <strong>${TOTAL_COMM} communautés</strong> du programme, <strong>${pool.length} (${pctCommSurTotal} %)</strong> comptent <strong>${trMeta.label}</strong>. Elles représentent <strong>${fmtNum(poolJeunes)} jeunes</strong> (${pctJeunesSurTotal} % du total), avec une moyenne de <strong>${moyPool} jeunes par communauté</strong> dans cette tranche.
 
 Sur le plan territorial, <strong>${zoneMax.label}</strong> concentre le plus grand nombre de ces communautés avec <strong>${zoneMax.comm} communautés</strong> (${zoneMax.pctTranche} % de la tranche, ${zoneMax.pctZone} % de sa zone). ${zoneMin.comm === 0 ? `<strong>${zoneMin.label}</strong> n'en compte aucune dans cette tranche.` : `<strong>${zoneMin.label}</strong> en compte ${zoneMin.comm} (${zoneMin.pctZone} % de sa zone).`}
 
 ${_interpretationTranche(trMeta.val, pool.length, pctJeunesSurTotal)}`;
 
     // Ajouter les cartes de zone au lieu du tableau zone (done below)
-    narratif += `\n\nSélectionnez une zone dans le filtre pour croiser cette tranche avec une zone spécifique.`;
+    narratif += isEn
+      ? `\n\nSelect a zone in the filter to cross this bracket with a specific zone.`
+      : `\n\nSélectionnez une zone dans le filtre pour croiser cette tranche avec une zone spécifique.`;
 
   } else if (zoneMeta && trMeta) {
     // MODE : zone + tranche → analyse croisée
     const totalZone = JOJ_DATA.filter(d => d.zone_id === zoneId).length;
-    const trancheGlobale = JOJ_DATA.filter(d => { const t = _trancheMeta(trancheVal); return d.jeunes >= t.min && d.jeunes <= t.max; });
+    const trancheGlobale = JOJ_DATA.filter(d => { const tm = _trancheMeta(trancheVal); return d.jeunes >= tm.min && d.jeunes <= tm.max; });
 
-    narratif = `Dans la <strong>${zoneMeta.label}</strong>, <strong>${pool.length} communauté${pool.length > 1 ? 's' : ''} (${pctCommSurBase} % de la zone)</strong> comptent <strong>${trMeta.label}</strong>, représentant <strong>${poolJeunes.toLocaleString('fr-FR')} jeunes</strong> et une moyenne de <strong>${moyPool} jeunes par communauté</strong>.
+    narratif = isEn ? `In <strong>${zoneMeta.label}</strong>, <strong>${pool.length} ${pool.length > 1 ? 'communities' : 'community'} (${pctCommSurBase} % of the zone)</strong> have <strong>${trMeta.label}</strong>, representing <strong>${fmtNum(poolJeunes)} youth</strong> and an average of <strong>${moyPool} youth per community</strong>.
+
+Nationally, these ${pool.length} communities represent <strong>${pctCommSurTotal} % of the program's 300 communities</strong> and <strong>${((pool.length / trancheGlobale.length) * 100).toFixed(1)} % of all communities in this bracket</strong> (${trancheGlobale.length} nationwide).
+
+${_interpretationCroisee(zoneMeta, trMeta, pool.length, totalZone)}` : `Dans la <strong>${zoneMeta.label}</strong>, <strong>${pool.length} communauté${pool.length > 1 ? 's' : ''} (${pctCommSurBase} % de la zone)</strong> comptent <strong>${trMeta.label}</strong>, représentant <strong>${fmtNum(poolJeunes)} jeunes</strong> et une moyenne de <strong>${moyPool} jeunes par communauté</strong>.
 
 À l'échelle nationale, ces ${pool.length} communautés représentent <strong>${pctCommSurTotal} % des 300 communautés</strong> du programme et <strong>${((pool.length / trancheGlobale.length) * 100).toFixed(1)} % de toutes les communautés dans cette tranche</strong> (${trancheGlobale.length} au total national).
 
@@ -609,16 +731,16 @@ ${_interpretationCroisee(zoneMeta, trMeta, pool.length, totalZone)}`;
 
   // Cartes tranche cliquables uniquement en mode zone-seule
   const trancheCardsHTML = (!trancheVal && zoneId) ? `
-    <div class="spatial-section-title" style="margin-top:18px">Explorer par tranche dans cette zone</div>
+    <div class="spatial-section-title" style="margin-top:18px">${t('spatial.section_explore_tranche')}</div>
     <div class="tranche-overview">
-      ${TRANCHES_META.map(t => {
-        const nb = basePool.filter(d => d.jeunes >= t.min && d.jeunes <= t.max).length;
+      ${getTranchesMeta().map(tr => {
+        const nb = basePool.filter(d => d.jeunes >= tr.min && d.jeunes <= tr.max).length;
         return `<div class="tranche-ov-item" onclick="
-          document.getElementById('globalJeunesFilter').value='${t.val}';
+          document.getElementById('globalJeunesFilter').value='${tr.val}';
           lancerAnalyseGlobale()">
           <div class="tranche-ov-val">${nb}</div>
-          <div class="tranche-ov-lbl">${t.label}</div>
-          <div class="tranche-ov-pct">${((nb/basePool.length)*100).toFixed(1)} % de la zone</div>
+          <div class="tranche-ov-lbl">${tr.label}</div>
+          <div class="tranche-ov-pct">${((nb/basePool.length)*100).toFixed(1)} ${t('spatial.pct_de_la_zone')}</div>
         </div>`;
       }).join('')}
     </div>` : '';
@@ -627,12 +749,12 @@ ${_interpretationCroisee(zoneMeta, trMeta, pool.length, totalZone)}`;
     <div class="spatial-section-title">${titreSection}</div>
     <div class="global-narratif">${narratif}</div>
     <div class="spatial-summary">
-      <div class="ss-item"><div class="ss-val">${pool.length}</div><div class="ss-lbl">Communautés</div></div>
-      <div class="ss-item"><div class="ss-val">${poolJeunes.toLocaleString('fr-FR')}</div><div class="ss-lbl">Jeunes 15-35</div></div>
-      <div class="ss-item"><div class="ss-val">${pctCommSurTotal} %</div><div class="ss-lbl">des 300 comm.</div></div>
-      <div class="ss-item"><div class="ss-val">${pctJeunesSurTotal} %</div><div class="ss-lbl">du total jeunes</div></div>
+      <div class="ss-item"><div class="ss-val">${pool.length}</div><div class="ss-lbl">${t('spatial.ss_comm')}</div></div>
+      <div class="ss-item"><div class="ss-val">${fmtNum(poolJeunes)}</div><div class="ss-lbl">${t('spatial.ss_jeunes')}</div></div>
+      <div class="ss-item"><div class="ss-val">${pctCommSurTotal} %</div><div class="ss-lbl">${t('spatial.ss_pct_300')}</div></div>
+      <div class="ss-item"><div class="ss-val">${pctJeunesSurTotal} %</div><div class="ss-lbl">${t('spatial.ss_pct_jeunes')}</div></div>
     </div>
-    <div class="spatial-section-title" style="margin-top:18px">Répartition par zone</div>
+    <div class="spatial-section-title" style="margin-top:18px">${t('spatial.section_repartition_zone')}</div>
     <div class="tranche-zones">
       ${zonesDetailData.map(z => `
         <div class="tranche-zone-card" style="cursor:pointer" onclick="
@@ -643,30 +765,38 @@ ${_interpretationCroisee(zoneMeta, trMeta, pool.length, totalZone)}`;
           <div class="tranche-zone-stats">
             <span class="tranche-zone-val">${z.comm} comm.</span>
             <span class="tranche-zone-sep">·</span>
-            <span>${z.jeunes.toLocaleString('fr-FR')} jeunes</span>
-            <span class="tranche-zone-pct">${z.pctZone} % de la zone · ${z.pctPool} % ici</span>
+            <span>${fmtNum(z.jeunes)} ${t('common.jeunes_word')}</span>
+            <span class="tranche-zone-pct">${z.pctZone} ${t('spatial.pct_de_la_zone')} · ${z.pctPool} ${t('spatial.pct_ici')}</span>
           </div>
         </div>`).join('')}
     </div>
     ${trancheCardsHTML}
-    <div class="spatial-section-title" style="margin-top:18px">Détail des ${pool.length} communautés (triées par jeunes ↓)</div>
+    <div class="spatial-section-title" style="margin-top:18px">${t('spatial.section_detail', { n: pool.length })}</div>
     <table class="spatial-table">
-      <thead><tr><th>Communauté</th><th>Région</th><th>Zone</th><th>Jeunes</th><th>Score</th><th>PRCC</th></tr></thead>
+      <thead><tr><th>${t('spatial.th_communaute')}</th><th>${t('spatial.th_region')}</th><th>${t('spatial.th_zone')}</th><th>${t('spatial.th_jeunes')}</th><th>${t('spatial.th_score')}</th><th>${t('spatial.th_prcc')}</th></tr></thead>
       <tbody>
         ${triees.map(d => `
           <tr>
             <td><b>${d.nom}</b></td>
             <td>${d.region}</td>
             <td><span class="zone-tag zt${d.zone_id}">Z${d.zone_id}</span></td>
-            <td><b>${d.jeunes.toLocaleString('fr-FR')}</b></td>
+            <td><b>${fmtNum(d.jeunes)}</b></td>
             <td>${d.score_total}/100</td>
-            <td>${d.statut === 'EN COURS' ? '🟣 EN COURS' : '—'}</td>
+            <td>${d.statut === 'EN COURS' ? '🟣 ' + trStatut('EN COURS') : '—'}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
 }
 
 function _interpretationTranche(val, nb, pctJeunes) {
+  const isEn = getLang() === 'en';
+  if (isEn) {
+    if (val === '0-200')      return `These ${nb} communities, although modest in size, are essential to the program's territorial coverage. They are often peripheral villages for which JO'TALI is a rare opportunity for inclusion.`;
+    if (val === '200-500')    return `These ${nb} communities form the program's backbone. With enough size to organize local activities, they are the main operational deployment lever for JO'TALI.`;
+    if (val === '500-1000')   return `These ${nb} communities have a critical mass of youth suited to large-scale events. They are ideal gathering points for smaller neighboring communes.`;
+    if (val === '1000-99999') return `These ${nb} communities alone concentrate ${pctJeunes} % of the total youth pool. Each should be prioritized as a host site for regional or zone events.`;
+    return '';
+  }
   if (val === '0-200')      return `Ces ${nb} communautés, bien que modestes en effectif, sont essentielles à la couverture territoriale du programme. Elles représentent souvent des villages périphériques pour lesquels JO'TALI est une opportunité rare d'inclusion.`;
   if (val === '200-500')    return `Ces ${nb} communautés forment le socle du programme. Avec une taille suffisante pour organiser des activités locales, elles constituent le principal levier de déploiement opérationnel de JO'TALI.`;
   if (val === '500-1000')   return `Ces ${nb} communautés disposent d'une masse critique de jeunes propice à des événements d'envergure. Elles sont idéales comme points de rassemblement pour les communes voisines plus petites.`;
@@ -675,7 +805,15 @@ function _interpretationTranche(val, nb, pctJeunes) {
 }
 
 function _interpretationCroisee(zoneMeta, trMeta, nb, totalZone) {
+  const isEn = getLang() === 'en';
   const pct = ((nb / totalZone) * 100).toFixed(1);
+  if (isEn) {
+    if (nb === 0) return `No community in ${zoneMeta.shortLabel} matches this bracket. This may reflect a particular demographic structure in this zone.`;
+    if (trMeta.val === '1000-99999') return `These ${nb} communities (${pct} % of ${zoneMeta.shortLabel}) are the zone's most powerful mobilization levers. They are the natural candidates to host this territory's major JO'TALI events.`;
+    if (trMeta.val === '500-1000')  return `With ${nb} communities representing ${pct} % of ${zoneMeta.shortLabel}, this bracket offers significant potential for zone events. Their accessibility and logistical capacity make them priority host sites.`;
+    if (trMeta.val === '200-500')   return `These ${nb} communities (${pct} % of ${zoneMeta.shortLabel}) form the intermediate fabric of the program in this zone. They are suited to local events and can help mobilize toward larger sites.`;
+    return `These ${nb} small communities (${pct} % of ${zoneMeta.shortLabel}) play an inclusive role in the program, ensuring that the least populated villages also benefit from JO'TALI activities.`;
+  }
   if (nb === 0) return `Aucune communauté de ${zoneMeta.shortLabel} ne correspond à cette tranche. Cela peut refléter une structure démographique particulière de cette zone.`;
   if (trMeta.val === '1000-99999') return `Ces ${nb} communautés (${pct} % de ${zoneMeta.shortLabel}) constituent les leviers de mobilisation les plus puissants de la zone. Elles sont les candidates naturelles pour accueillir les grandes manifestations JO'TALI de ce territoire.`;
   if (trMeta.val === '500-1000')  return `Avec ${nb} communautés représentant ${pct} % de ${zoneMeta.shortLabel}, cette tranche offre un potentiel significatif pour des événements de zone. Leur accessibilité et leur capacité logistique en font des sites d'accueil prioritaires.`;
@@ -688,5 +826,3 @@ function _afficherAnalyseTranche(val) {
   document.getElementById('globalJeunesFilter').value = val;
   lancerAnalyseGlobale();
 }
-
-

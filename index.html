@@ -202,6 +202,25 @@
 
   .hub-footer{margin-top:52px;font-size:11px;color:#4a6156;letter-spacing:.14em;text-transform:uppercase}
 
+  #hub-lang-toggle{
+    position:absolute;top:24px;left:28px;z-index:6;
+    background:rgba(255,255,255,.06);border:1.5px solid rgba(243,156,18,.3);
+    color:#fff;padding:7px 14px;border-radius:20px;
+    font-size:.72rem;font-weight:700;letter-spacing:.04em;
+    cursor:pointer;transition:background .2s,border-color .2s;
+  }
+  #hub-lang-toggle:hover{background:rgba(243,156,18,.12);border-color:#F39C12}
+
+  /* Bouton de langue (visible pendant le splash) */
+  #s-lang-toggle{
+    position:absolute;top:24px;left:28px;z-index:10;margin-left:0;
+    background:rgba(255,255,255,.05);border:1.5px solid rgba(243,156,18,.3);
+    color:#aab;font-size:11px;font-weight:700;letter-spacing:.08em;
+    padding:7px 13px;border-radius:20px;
+    cursor:pointer;transition:color .2s,border-color .2s,background .2s;
+  }
+  #s-lang-toggle:hover{color:#fff;border-color:#F39C12;background:rgba(243,156,18,.1)}
+
   @media (max-width:720px){
     .hub-doors{flex-direction:column;align-items:center}
     .hub-door{width:100%;max-width:360px}
@@ -216,12 +235,13 @@
 <div id="splash">
   <div id="ambient-bg"></div>
   <div id="s-dust"></div>
-  <button id="s-skip" onclick="splashExit()">Passer ›</button>
+  <button id="s-lang-toggle" class="lang-toggle">🇬🇧 EN</button>
+  <button id="s-skip" onclick="splashExit()" data-i18n="splash.skip">Passer ›</button>
 
   <!-- Acte 1 : Citation Mandela -->
   <div class="scene active" id="scene1">
     <div class="s-quote-mark">"</div>
-    <div class="s-big-quote">
+    <div class="s-big-quote" data-i18n-html="splash.quote">
       Le sport a le pouvoir de changer le monde.<br>
       Il a le pouvoir d'inspirer.<br>
       Il a le pouvoir d'unir les peuples.
@@ -231,10 +251,10 @@
 
   <!-- Acte 2 : Le constat -->
   <div class="scene" id="scene2">
-    <div class="s-constat-line">
+    <div class="s-constat-line" data-i18n-html="splash.constat1">
       Les Jeux Olympiques de la Jeunesse arrivent à <strong>Dakar en 2026</strong>.
     </div>
-    <div class="s-constat-line dim">
+    <div class="s-constat-line dim" data-i18n-html="splash.constat2">
       Mais beaucoup de jeunes risquent de les regarder de loin —<br>
       depuis leur village, loin des projecteurs.
     </div>
@@ -242,17 +262,17 @@
 
   <!-- Acte 3 : La mission -->
   <div class="scene" id="scene3">
-    <div class="s-mission-title">
+    <div class="s-mission-title" data-i18n-html="splash.mission_title">
       Et si l'esprit des Jeux<br>voyageait jusqu'à <span class="gold">eux</span> ?
     </div>
-    <div class="s-mission-sub">
+    <div class="s-mission-sub" data-i18n-html="splash.mission_sub">
       JO'TALI porte le sport, le dialogue et le leadership<br>
       directement dans les communautés du Sénégal.
     </div>
     <div class="s-pillars">
       <div class="s-pillar" id="sp1">
         <div class="s-pillar-circle">⚽</div>
-        <div class="s-pillar-label">Sport & jeu</div>
+        <div class="s-pillar-label" data-i18n="splash.pillar1">Sport & jeu</div>
       </div>
       <div class="s-pillar" id="sp2">
         <div class="s-pillar-circle">💬</div>
@@ -264,7 +284,7 @@
       </div>
       <div class="s-pillar" id="sp4">
         <div class="s-pillar-circle">🏘️</div>
-        <div class="s-pillar-label">Héritage</div>
+        <div class="s-pillar-label" data-i18n="splash.pillar4">Héritage</div>
       </div>
     </div>
   </div>
@@ -278,10 +298,10 @@
       <div class="s-ring sr4"></div>
       <div class="s-ring sr5"></div>
     </div>
-    <div class="s-final-title">
+    <div class="s-final-title" data-i18n-html="splash.final_title">
       Ramener les Jeux<br>dans les <span class="gold">communautés</span>
     </div>
-    <div class="s-final-sub">JO'TALI × Tostan · Plateforme 2026</div>
+    <div class="s-final-sub" data-i18n="splash.final_sub">JO'TALI × Tostan · Plateforme 2026</div>
   </div>
 
   <!-- Points de progression -->
@@ -299,6 +319,7 @@
      HUB — 3 PORTES
 ════════════════════════════════════════════════════ -->
 <div id="hub">
+  <button id="hub-lang-toggle" class="lang-toggle">🇬🇧 EN</button>
   <header class="hub-header">
     <div class="olympic-rings">
       <div class="ring ring-1"></div>
@@ -309,16 +330,16 @@
     </div>
     <div class="hub-header-text">
       <h1>JO'TALI <span class="gold">×</span> Tostan 2026</h1>
-      <p>Choisissez votre espace</p>
+      <p data-i18n="hub.subtitle">Choisissez votre espace</p>
     </div>
   </header>
 
   <div class="hub-doors">
     <a class="hub-door" href="selection.html">
       <div class="hub-door-icon">🗺️</div>
-      <h2>Sélection</h2>
-      <p>Carte interactive, statistiques, analyse spatiale et liste des 300 communautés pilotes</p>
-      <span class="hub-door-cta">Explorer →</span>
+      <h2 data-i18n="hub.door_selection_title">Sélection</h2>
+      <p data-i18n="hub.door_selection_desc">Carte interactive, statistiques, analyse spatiale et liste des 300 communautés pilotes</p>
+      <span class="hub-door-cta" data-i18n="hub.door_cta">Explorer →</span>
     </a>
   </div>
 
@@ -326,6 +347,7 @@
 </div>
 
 <!-- ══ SPLASH SCRIPT ══════════════════════════════════════ -->
+<script src="js/i18n.js"></script>
 <script>
 (function(){
   const SEEN_KEY = 'jojtostan_splash_seen';

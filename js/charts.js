@@ -4,6 +4,12 @@
    ============================================================ */
 
 let chartsBuilt = false;
+let chartInstances = [];
+
+function destroyCharts() {
+  chartInstances.forEach(c => c.destroy());
+  chartInstances = [];
+}
 
 function buildCharts() {
   if (chartsBuilt) return;
@@ -17,7 +23,7 @@ function buildCharts() {
   JOJ_DATA.forEach(d => { if (d.region) regionCounts[d.region] = (regionCounts[d.region] || 0) + 1; });
   const regEntries = Object.entries(regionCounts).sort((a, b) => b[1] - a[1]);
 
-  new Chart(document.getElementById('chartRegions'), {
+  chartInstances.push(new Chart(document.getElementById('chartRegions'), {
     type: 'bar',
     data: {
       labels: regEntries.map(e => e[0]),
@@ -36,10 +42,10 @@ function buildCharts() {
         y: { grid: { display: false } }
       }
     }
-  });
+  }));
 
   // ── 2. Donut zones ───────────────────────────────────────
-  new Chart(document.getElementById('chartZones'), {
+  chartInstances.push(new Chart(document.getElementById('chartZones'), {
     type: 'doughnut',
     data: {
       labels: ['Zone 1 — Kolda & Sédhiou', 'Zone 2 — Tamba & Kédougou', 'Zone 3 — Matam'],
@@ -57,17 +63,17 @@ function buildCharts() {
         legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } }
       }
     }
-  });
+  }));
 
   // ── 3. Statuts PRCC ──────────────────────────────────────
   const prccCounts = {};
   JOJ_DATA.forEach(d => { const k = d.statut || 'Inconnu'; prccCounts[k] = (prccCounts[k] || 0) + 1; });
   const prccEntries = Object.entries(prccCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-  new Chart(document.getElementById('chartPRCC'), {
+  chartInstances.push(new Chart(document.getElementById('chartPRCC'), {
     type: 'bar',
     data: {
-      labels: prccEntries.map(e => e[0]),
+      labels: prccEntries.map(e => trStatut(e[0])),
       datasets: [{
         data: prccEntries.map(e => e[1]),
         backgroundColor: prccEntries.map(e => e[0] === 'EN COURS' ? '#8E44AD' : '#95a5a6'),
@@ -81,7 +87,7 @@ function buildCharts() {
         x: { ticks: { maxRotation: 35, font: { size: 10 } }, grid: { display: false } }
       }
     }
-  });
+  }));
 
   // ── 4. Distribution des scores ───────────────────────────
   const bins = { '35–45': 0, '46–55': 0, '56–70': 0, '71–80': 0 };
@@ -92,7 +98,7 @@ function buildCharts() {
     else                          bins['71–80']++;
   });
 
-  new Chart(document.getElementById('chartScores'), {
+  chartInstances.push(new Chart(document.getElementById('chartScores'), {
     type: 'bar',
     data: {
       labels: Object.keys(bins),
@@ -109,13 +115,13 @@ function buildCharts() {
         x: { grid: { display: false } }
       }
     }
-  });
+  }));
 
   // ── 5. Jeunes par zone (barres verticales) ───────────────
   const jeunesZone = { 1: 0, 2: 0, 3: 0 };
   JOJ_DATA.forEach(d => { jeunesZone[d.zone_id] += d.jeunes; });
 
-  new Chart(document.getElementById('chartJeunes'), {
+  chartInstances.push(new Chart(document.getElementById('chartJeunes'), {
     type: 'bar',
     data: {
       labels: ['Zone 1\nKolda & Sédhiou', 'Zone 2\nTamba & Kédougou', 'Zone 3\nMatam'],
@@ -130,13 +136,13 @@ function buildCharts() {
       scales: {
         y: {
           beginAtZero: true,
-          title: { display: true, text: 'Milliers de jeunes' },
+          title: { display: true, text: t('charts.axis_milliers') },
           grid: { color: GRID_COLOR }
         },
         x: { grid: { display: false } }
       }
     }
-  });
+  }));
 
   // ── 6. Couverture RPP & P&S ──────────────────────────────
   const rppOnly  = JOJ_DATA.filter(d => d.rpp === 'Oui' && d.ps !== 'Oui').length;
@@ -144,10 +150,10 @@ function buildCharts() {
   const both     = JOJ_DATA.filter(d => d.rpp === 'Oui' && d.ps  === 'Oui').length;
   const none     = JOJ_DATA.filter(d => d.rpp !== 'Oui' && d.ps  !== 'Oui').length;
 
-  new Chart(document.getElementById('chartProgrammes'), {
+  chartInstances.push(new Chart(document.getElementById('chartProgrammes'), {
     type: 'doughnut',
     data: {
-      labels: ['RPP seul', 'P&S seul', 'RPP + P&S', 'PRCC uniquement'],
+      labels: [t('charts.label_rpp_only'), t('charts.label_ps_only'), t('charts.label_both'), t('charts.label_none')],
       datasets: [{
         data: [rppOnly, psOnly, both, none],
         backgroundColor: ['#27AE60', '#2980B9', '#F39C12', '#95a5a6'],
@@ -159,6 +165,6 @@ function buildCharts() {
       cutout: '60%',
       plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
     }
-  });
+  }));
 
 }

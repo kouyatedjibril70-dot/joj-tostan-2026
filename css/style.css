@@ -71,6 +71,7 @@ body {
 .ring-5 { border-color: #fff;    margin-left: -6px; }
 .header-title h1 { color: #fff; font-size: 1.1rem; font-weight: 700; letter-spacing: .3px; }
 .header-title p  { color: #aab; font-size: .72rem; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
 .header-badge {
   background: var(--gold);
   color: #fff;
@@ -1125,6 +1126,15 @@ body.anim-done #map {
 .sw-link:hover { color: #fff; border-color: rgba(243,156,18,.4); }
 .sw-link.sw-active { background: var(--gold); color: #1a1a2e; }
 
+.lang-toggle {
+  background: rgba(255,255,255,.06); border: 1.5px solid rgba(243,156,18,.3);
+  color: #fff; padding: 7px 14px; border-radius: 20px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+  cursor: pointer; transition: background .2s, border-color .2s;
+  margin-left: 8px;
+}
+.lang-toggle:hover { background: rgba(243,156,18,.12); border-color: var(--gold); }
+
 .placeholder-main {
   flex: 1; display: flex; align-items: center; justify-content: center;
   background: linear-gradient(160deg, #0a0e1a 0%, #12201a 55%, var(--forest) 140%);
@@ -1183,7 +1193,7 @@ body.anim-done #map {
 
   /* Titre de page en haut */
   .rapport-page::before {
-    content: "JOJ × Tostan 2026 — Sélection des Communautés Pilotes";
+    content: "JO'TALI × Tostan 2026 — Sélection des Communautés Pilotes";
     display: block;
     font-size: 16px;
     font-weight: 800;

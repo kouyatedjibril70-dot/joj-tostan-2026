@@ -76,7 +76,7 @@ function renderTable() {
 
   // Compteur
   const counter = document.getElementById('tableCount');
-  if (counter) counter.textContent = `${total} communauté${total > 1 ? 's' : ''}`;
+  if (counter) counter.textContent = `${total} ${total > 1 ? t('table.js.communaute_plural') : t('table.js.communaute_singular')}`;
 
   // Corps du tableau
   const tbody  = document.getElementById('tableBody');
@@ -93,10 +93,10 @@ function renderTable() {
       <td>${d.dept}</td>
       <td>${d.commune || '—'}</td>
       <td><span class="zone-tag ${zTag[d.zone_id]}">Z${d.zone_id}</span></td>
-      <td><span class="prcc-tag ${prccClass(d.statut)}">${d.statut}</span></td>
-      <td>${d.jeunes.toLocaleString('fr-FR')}</td>
-      <td class="${d.rpp === 'Oui' ? 'oui-val' : 'non-val'}">${d.rpp}</td>
-      <td class="${d.ps  === 'Oui' ? 'oui-val' : 'non-val'}">${d.ps}</td>
+      <td><span class="prcc-tag ${prccClass(d.statut)}">${trStatut(d.statut)}</span></td>
+      <td>${fmtNum(d.jeunes)}</td>
+      <td class="${d.rpp === 'Oui' ? 'oui-val' : 'non-val'}">${trYesNo(d.rpp)}</td>
+      <td class="${d.ps  === 'Oui' ? 'oui-val' : 'non-val'}">${trYesNo(d.ps)}</td>
       <td>
         <div class="score-bar-cell">
           <div class="mini-bar">
@@ -120,9 +120,9 @@ function renderPagination(total) {
   const start = (currentPage - 1) * PER_PAGE + 1;
   const end   = Math.min(currentPage * PER_PAGE, total);
 
-  let html = `<span class="page-info">${start}–${end} sur ${total}</span>`;
-  if (currentPage > 1)         html = `<button class="page-btn" onclick="goPage(${currentPage - 1})">◀ Préc.</button>` + html;
-  if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage + 1})">Suiv. ▶</button>`;
+  let html = `<span class="page-info">${t('table.js.page_info', { start, end, total })}</span>`;
+  if (currentPage > 1)         html = `<button class="page-btn" onclick="goPage(${currentPage - 1})">${t('table.prev')}</button>` + html;
+  if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage + 1})">${t('table.next')}</button>`;
 
   footer.innerHTML = html;
 }

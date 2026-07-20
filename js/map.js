@@ -41,41 +41,44 @@ function popupHTML(d) {
   return `
     <div class="popup-nom">🏘️ ${d.nom}</div>
     <div class="popup-grid">
-      <span class="popup-lbl">Région</span>       <span class="popup-val">${d.region}</span>
-      <span class="popup-lbl">Département</span>  <span class="popup-val">${d.dept}</span>
+      <span class="popup-lbl">${t('map.popup.region')}</span>       <span class="popup-val">${d.region}</span>
+      <span class="popup-lbl">${t('map.popup.dept')}</span>  <span class="popup-val">${d.dept}</span>
       <span class="popup-lbl">Commune</span>       <span class="popup-val">${d.commune || '—'}</span>
       <span class="popup-lbl">Zone</span>          <span class="popup-val" style="color:${zc}">${d.zone}</span>
-      <span class="popup-lbl">PRCC</span>          <span class="popup-val" style="color:${d.statut==='EN COURS'?'#8E44AD':'#27AE60'}">${d.statut}</span>
-      <span class="popup-lbl">Jeunes 15-35</span> <span class="popup-val">${d.jeunes.toLocaleString('fr-FR')}</span>
-      <span class="popup-lbl">RPP</span>           <span class="popup-val">${d.rpp}</span>
-      <span class="popup-lbl">P&S</span>           <span class="popup-val">${d.ps}</span>
+      <span class="popup-lbl">PRCC</span>          <span class="popup-val" style="color:${d.statut==='EN COURS'?'#8E44AD':'#27AE60'}">${trStatut(d.statut)}</span>
+      <span class="popup-lbl">${t('map.popup.jeunes')}</span> <span class="popup-val">${fmtNum(d.jeunes)}</span>
+      <span class="popup-lbl">RPP</span>           <span class="popup-val">${trYesNo(d.rpp)}</span>
+      <span class="popup-lbl">P&S</span>           <span class="popup-val">${trYesNo(d.ps)}</span>
     </div>
-    <div class="popup-score-label">Score de sélection</div>
+    <div class="popup-score-label">${t('map.popup.score_label')}</div>
     <div class="popup-bar"><div class="popup-fill" style="width:${pct}%;background:${color}"></div></div>
     <div class="popup-sub">
       <span>PRCC ${d.score_prcc}/35</span>
-      <span>Jeunes ${d.score_jeunesse}/30</span>
-      <span>Prox ${d.score_proximite}/20</span>
+      <span>${t('map.score_label_jeunes')} ${d.score_jeunesse}/30</span>
+      <span>${t('map.score_label_prox')} ${d.score_proximite}/20</span>
       <span>P&S ${d.score_densite}/15</span>
     </div>
     <div class="popup-total">
-      <span>Score total</span>
+      <span>${t('map.popup.score_total')}</span>
       <span>${d.score_total} / 100</span>
     </div>`;
 }
 
 /* ── Mettre à jour le panneau latéral ───────────────────── */
+let lastSelectedCommunity = null;
+
 function updateSidePanel(d) {
+  lastSelectedCommunity = d;
   const panel = document.getElementById('sidePanel');
   if (!panel) return;
   const zc    = { 1:'#27AE60', 2:'#E74C3C', 3:'#2980B9' }[d.zone_id];
   const color = markerColor(d);
 
   const scoreRows = [
-    { label:'PRCC',     val: d.score_prcc,       max: 35, color:'#8E44AD' },
-    { label:'Jeunes',   val: d.score_jeunesse,   max: 30, color:'#F39C12' },
-    { label:'Proximité',val: d.score_proximite,  max: 20, color:'#2980B9' },
-    { label:'P&S/RPP',  val: d.score_densite,    max: 15, color:'#27AE60' }
+    { label:'PRCC',                          val: d.score_prcc,       max: 35, color:'#8E44AD' },
+    { label:t('map.score_label_jeunes'),     val: d.score_jeunesse,   max: 30, color:'#F39C12' },
+    { label:t('map.score_label_proximite'),  val: d.score_proximite,  max: 20, color:'#2980B9' },
+    { label:'P&S/RPP',                       val: d.score_densite,    max: 15, color:'#27AE60' }
   ].map(r => `
     <div class="score-row">
       <span class="s-label">${r.label}</span>
@@ -91,42 +94,42 @@ function updateSidePanel(d) {
     <div class="side-body">
       <div class="side-stat-grid">
         <div class="side-stat">
-          <div class="val">${d.jeunes.toLocaleString('fr-FR')}</div>
-          <div class="lbl">Jeunes 15-35</div>
+          <div class="val">${fmtNum(d.jeunes)}</div>
+          <div class="lbl">${t('map.side.jeunes')}</div>
         </div>
         <div class="side-stat">
           <div class="val" style="color:${color}">${d.score_total}</div>
-          <div class="lbl">Score /100</div>
+          <div class="lbl">${t('map.side.score')}</div>
         </div>
         <div class="side-stat">
           <div class="val">${d.region}</div>
-          <div class="lbl">Région</div>
+          <div class="lbl">${t('map.side.region')}</div>
         </div>
         <div class="side-stat">
           <div class="val">${d.dept}</div>
-          <div class="lbl">Département</div>
+          <div class="lbl">${t('map.side.dept')}</div>
         </div>
       </div>
       <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px">
-        <strong>Commune :</strong> ${d.commune || '—'}
+        <strong>${t('map.side.commune')}</strong> ${d.commune || '—'}
       </div>
       <div class="score-section">
-        <h4>Détail des scores</h4>
+        <h4>${t('map.side.score_detail')}</h4>
         ${scoreRows}
         <div class="score-total-row">
-          <span class="label">Score total</span>
+          <span class="label">${t('map.side.score_total_row')}</span>
           <span class="value">${d.score_total} / 100</span>
         </div>
       </div>
       <div class="score-section">
-        <h4>Statut PRCC</h4>
-        <span class="badge prcc">${d.statut}</span>
+        <h4>${t('map.side.statut_prcc')}</h4>
+        <span class="badge prcc">${trStatut(d.statut)}</span>
       </div>
       <div class="score-section">
-        <h4>Programmes</h4>
+        <h4>${t('map.side.programmes')}</h4>
         <div class="badge-row">
-          <span class="badge ${d.rpp==='Oui'?'oui':'non'}">RPP : ${d.rpp}</span>
-          <span class="badge ${d.ps==='Oui'?'oui':'non'}">P&S : ${d.ps}</span>
+          <span class="badge ${d.rpp==='Oui'?'oui':'non'}">RPP : ${trYesNo(d.rpp)}</span>
+          <span class="badge ${d.ps==='Oui'?'oui':'non'}">P&S : ${trYesNo(d.ps)}</span>
         </div>
       </div>
       <div style="font-size:.7rem;color:var(--muted);margin-top:12px">
@@ -137,13 +140,22 @@ function updateSidePanel(d) {
 
 /* ── Réinitialiser le panneau latéral ───────────────────── */
 function resetSidePanel() {
+  lastSelectedCommunity = null;
   const panel = document.getElementById('sidePanel');
   if (!panel) return;
   panel.innerHTML = `
     <div class="side-panel-empty">
       <div class="icon">🗺️</div>
-      <div>Cliquez sur une communauté<br>pour voir sa fiche détaillée</div>
+      <div>${t('map.side_empty')}</div>
     </div>`;
+}
+
+/* ── Rafraîchir les textes traduits sans changer la sélection ── */
+function refreshMapI18n() {
+  if (!allMarkers.length) return;
+  allMarkers.forEach(m => m.setPopupContent(popupHTML(m._data)));
+  if (lastSelectedCommunity) updateSidePanel(lastSelectedCommunity);
+  else resetSidePanel();
 }
 
 /* ── Initialiser la carte ────────────────────────────────── */
@@ -196,7 +208,7 @@ function loadZonePolygons() {
         },
         onEachFeature(feature, layer) {
           const p = feature.properties;
-          layer.bindTooltip(`<b>${p.nom}</b><br>${p.nb_communautes} communautés`, {
+          layer.bindTooltip(`<b>${p.nom}</b><br>${p.nb_communautes} ${t('map.zone_tooltip_communautes')}`, {
             sticky: true, className: 'zone-tooltip'
           });
         }

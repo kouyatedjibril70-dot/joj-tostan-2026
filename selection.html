@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOJ × Tostan 2026 — Sélection des Communautés</title>
+  <title>JO'TALI × Tostan 2026 — Sélection des Communautés</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
@@ -22,24 +22,27 @@
       <div class="ring ring-5"></div>
     </div>
     <div class="header-title">
-      <h1>🏅 JOJ × Tostan 2026 — Sélection des Communautés Pilotes</h1>
-      <p>Tableau de bord géospatial · Sénégal · 300 communautés · 3 zones d'intervention</p>
+      <h1 data-i18n="app.title">🏅 JO'TALI × Tostan 2026 — Sélection des Communautés Pilotes</h1>
+      <p data-i18n="app.subtitle">Tableau de bord géospatial · Sénégal · 300 communautés · 3 zones d'intervention</p>
     </div>
   </div>
   <nav class="space-switcher">
-    <a href="index.html" class="sw-link">🏠 Hub</a>
-    <a href="selection.html" class="sw-link sw-active">🗺️ Sélection</a>
+    <a href="index.html" class="sw-link" data-i18n="nav.hub">🏠 Hub</a>
+    <a href="selection.html" class="sw-link sw-active" data-i18n="nav.selection">🗺️ Sélection</a>
   </nav>
-  <div class="header-badge">TEAM SERA</div>
+  <div class="header-right">
+    <button class="lang-toggle" id="selectionLangToggle">🇬🇧 EN</button>
+    <div class="header-badge">TEAM SERA</div>
+  </div>
 </header>
 
 <!-- ═══════════════════════ NAV TABS ══════════════════════ -->
 <nav class="nav-tabs">
-  <button class="tab-btn active" onclick="showTab('map', this)">🗺️ Carte interactive</button>
-  <button class="tab-btn" onclick="showTab('charts', this)">📊 Statistiques</button>
-  <button class="tab-btn" onclick="showTab('table', this)">📋 Liste des communautés</button>
-  <button class="tab-btn" onclick="showTab('spatial', this)">🧭 Analyse spatiale</button>
-  <button class="tab-btn" onclick="showTab('rapport', this)">📄 Rapport</button>
+  <button class="tab-btn active" onclick="showTab('map', this)" data-i18n="tab.map">🗺️ Carte interactive</button>
+  <button class="tab-btn" onclick="showTab('charts', this)" data-i18n="tab.charts">📊 Statistiques</button>
+  <button class="tab-btn" onclick="showTab('table', this)" data-i18n="tab.table">📋 Liste des communautés</button>
+  <button class="tab-btn" onclick="showTab('spatial', this)" data-i18n="tab.spatial">🧭 Analyse spatiale</button>
+  <button class="tab-btn" onclick="showTab('rapport', this)" data-i18n="tab.rapport">📄 Rapport</button>
 </nav>
 
 <!-- ═══════════════════════ MAIN ══════════════════════════ -->
@@ -48,7 +51,7 @@
   <div class="kpi-strip">
     <div class="kpi-card">
       <div class="kpi-val" data-target="300">300</div>
-      <div class="kpi-label">Communautés sélectionnées</div>
+      <div class="kpi-label" data-i18n="kpi.total">Communautés sélectionnées</div>
     </div>
     <div class="kpi-card z1">
       <div class="kpi-val" data-target="141">141</div>
@@ -64,7 +67,7 @@
     </div>
     <div class="kpi-card purple">
       <div class="kpi-val" data-target="91219">91 219</div>
-      <div class="kpi-label">Jeunes 15-35 estimés</div>
+      <div class="kpi-label" data-i18n="kpi.jeunes">Jeunes 15-35 estimés</div>
     </div>
   </div>
 
@@ -73,19 +76,19 @@
     <div class="map-layout">
       <div class="map-controls">
         <div class="ctrl-group">
-          <span class="ctrl-label">Zone :</span>
-          <button class="zone-btn all active" onclick="filterZone(0, this)">Toutes (300)</button>
+          <span class="ctrl-label" data-i18n="map.zone_label">Zone :</span>
+          <button class="zone-btn all active" onclick="filterZone(0, this)" data-i18n="map.zone_all">Toutes (300)</button>
           <button class="zone-btn z1" onclick="filterZone(1, this)">🟢 Zone 1 — Kolda & Sédhiou (141)</button>
           <button class="zone-btn z2" onclick="filterZone(2, this)">🔴 Zone 2 — Tamba & Kédougou (59)</button>
           <button class="zone-btn z3" onclick="filterZone(3, this)">🔵 Zone 3 — Matam (100)</button>
         </div>
-        <button class="toggle-btn" id="btnPRCC" onclick="togglePRCC()">🟣 EN COURS uniquement (20)</button>
+        <button class="toggle-btn" id="btnPRCC" onclick="togglePRCC()" data-i18n="map.prcc_toggle">🟣 EN COURS uniquement (20)</button>
       </div>
       <div id="map"></div>
       <div class="side-panel" id="sidePanel">
         <div class="side-panel-empty">
           <div class="icon">🗺️</div>
-          <div>Cliquez sur une communauté<br>pour voir sa fiche détaillée</div>
+          <div data-i18n-html="map.side_empty">Cliquez sur une communauté<br>pour voir sa fiche détaillée</div>
         </div>
       </div>
     </div>
@@ -95,35 +98,35 @@
   <div class="tab-content" id="tab-charts">
     <div class="charts-grid">
       <div class="chart-card wide">
-        <h3>🌍 Répartition par région</h3>
+        <h3 data-i18n="charts.regions_title">🌍 Répartition par région</h3>
         <div class="chart-wrap"><canvas id="chartRegions"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.regions_explain">
           Ce graphique montre le nombre de communautés pilotes sélectionnées dans chaque région administrative du Sénégal.
           <strong>Kolda et Sédhiou</strong> concentrent le plus grand nombre car Tostan y est le plus implanté historiquement.
           Plus une barre est longue, plus la région a de communautés participantes.
         </p>
       </div>
       <div class="chart-card">
-        <h3>🏅 Communautés par zone</h3>
+        <h3 data-i18n="charts.zones_title">🏅 Communautés par zone</h3>
         <div class="chart-wrap"><canvas id="chartZones"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.zones_explain">
           Les 300 communautés sont réparties en <strong>3 zones géographiques</strong> d'intervention.
           La Zone 1 (Kolda & Sédhiou) représente près de la moitié du total (141), suivie de la Zone 3 (Matam, 100) et de la Zone 2 (Tamba & Kédougou, 59).
         </p>
       </div>
       <div class="chart-card wide">
-        <h3>📅 Statuts PRCC (Top 10)</h3>
+        <h3 data-i18n="charts.prcc_title">📅 Statuts PRCC (Top 10)</h3>
         <div class="chart-wrap"><canvas id="chartPRCC"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.prcc_explain">
           Le <strong>PRCC (Programme de Renforcement des Communautés et des Capacités)</strong> indique l'année à laquelle Tostan est intervenu dans la communauté.
           Les <strong>20 communautés "EN COURS"</strong> (violet) sont la priorité absolue car elles bénéficient d'un accompagnement actif au moment de la sélection.
           Les autres communautés ont terminé leur programme entre 2015 et 2026.
         </p>
       </div>
       <div class="chart-card">
-        <h3>🎯 Distribution des scores /100</h3>
+        <h3 data-i18n="charts.scores_title">🎯 Distribution des scores /100</h3>
         <div class="chart-wrap"><canvas id="chartScores"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.scores_explain">
           Chaque communauté a obtenu un <strong>score de sélection sur 100 points</strong>. Ce graphique regroupe les 300 communautés en 4 catégories selon leur score :<br>
           • <strong>35–45 pts</strong> : communautés sélectionnées avec un score faible<br>
           • <strong>46–55 pts</strong> : score moyen<br>
@@ -133,18 +136,18 @@
         </p>
       </div>
       <div class="chart-card wide">
-        <h3>👥 Jeunes 15-35 estimés par zone (milliers)</h3>
+        <h3 data-i18n="charts.jeunes_title">👥 Jeunes 15-35 estimés par zone (milliers)</h3>
         <div class="chart-wrap"><canvas id="chartJeunes"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.jeunes_explain">
           Ce graphique compare le <strong>nombre total de jeunes de 15 à 35 ans estimés</strong> dans les communautés sélectionnées de chaque zone.
           C'est l'indicateur clé de l'impact potentiel du programme JO'TALI : plus la barre est haute, plus la zone touchera un grand nombre de jeunes.
           Le total toutes zones confondues est de <strong>91 219 jeunes</strong>.
         </p>
       </div>
       <div class="chart-card">
-        <h3>🔗 Couverture RPP & P&S</h3>
+        <h3 data-i18n="charts.programmes_title">🔗 Couverture RPP & P&S</h3>
         <div class="chart-wrap"><canvas id="chartProgrammes"></canvas></div>
-        <p class="chart-explain">
+        <p class="chart-explain" data-i18n-html="charts.programmes_explain">
           <strong>RPP</strong> (Renforcement des Pratiques Parentales) et <strong>P&S</strong> (Paix & Sécurité) sont deux programmes complémentaires de Tostan.
           Ce graphique montre combien de communautés bénéficient de ces accompagnements en plus du PRCC. La catégorie <strong>PRCC uniquement</strong> regroupe les communautés qui ont eu un PRCC (terminé ou en cours) mais sans RPP ni P&S actifs.
         </p>
@@ -157,19 +160,19 @@
     <div class="table-page">
       <div class="table-controls">
         <input type="text" id="tableSearch" class="search-input"
-               placeholder="🔍 Rechercher…" oninput="filterTable()">
+               placeholder="🔍 Rechercher…" data-i18n-placeholder="table.search_placeholder" oninput="filterTable()">
         <select id="filterZoneT" class="filter-select" onchange="filterTable()">
-          <option value="">Toutes les zones</option>
+          <option value="" data-i18n="table.all_zones">Toutes les zones</option>
           <option value="1">Zone 1 — Kolda & Sédhiou</option>
           <option value="2">Zone 2 — Tamba & Kédougou</option>
           <option value="3">Zone 3 — Matam</option>
         </select>
         <select id="filterRegion" class="filter-select" onchange="filterTable()">
-          <option value="">Toutes les régions</option>
+          <option value="" data-i18n="table.all_regions">Toutes les régions</option>
         </select>
         <select id="filterPRCCT" class="filter-select" onchange="filterTable()">
-          <option value="">Tous statuts PRCC</option>
-          <option value="EN COURS">EN COURS</option>
+          <option value="" data-i18n="table.all_prcc">Tous statuts PRCC</option>
+          <option value="EN COURS" data-i18n="table.prcc_encours">EN COURS</option>
           <option value="2026">Terminé 2026</option>
           <option value="2025">Terminé 2025</option>
           <option value="2023">Terminé 2023</option>
@@ -178,9 +181,9 @@
           <option value="2015">Terminé 2015</option>
         </select>
         <select id="filterRPP" class="filter-select" onchange="filterTable()">
-          <option value="">RPP : Tous</option>
-          <option value="Oui">RPP : Oui</option>
-          <option value="Non">RPP : Non</option>
+          <option value="" data-i18n="table.rpp_all">RPP : Tous</option>
+          <option value="Oui" data-i18n="table.rpp_oui">RPP : Oui</option>
+          <option value="Non" data-i18n="table.rpp_non">RPP : Non</option>
         </select>
         <button onclick="exportCSV()" style="padding:7px 14px;border-radius:20px;border:2px solid #27AE60;background:#27AE60;color:#fff;cursor:pointer;font-size:.78rem;font-weight:700;margin-left:4px;">
           ⬇️ Export CSV
@@ -191,13 +194,13 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th onclick="sortTable('nom')">Communauté ↕</th>
-              <th onclick="sortTable('region')">Région ↕</th>
-              <th onclick="sortTable('dept')">Département ↕</th>
+              <th onclick="sortTable('nom')" data-i18n="table.th_communaute">Communauté ↕</th>
+              <th onclick="sortTable('region')" data-i18n="table.th_region">Région ↕</th>
+              <th onclick="sortTable('dept')" data-i18n="table.th_dept">Département ↕</th>
               <th onclick="sortTable('commune')">Commune ↕</th>
-              <th onclick="sortTable('zone_id')">Zone ↕</th>
-              <th onclick="sortTable('statut')">Statut PRCC ↕</th>
-              <th onclick="sortTable('jeunes')">Jeunes ↕</th>
+              <th onclick="sortTable('zone_id')" data-i18n="table.th_zone">Zone ↕</th>
+              <th onclick="sortTable('statut')" data-i18n="table.th_statut">Statut PRCC ↕</th>
+              <th onclick="sortTable('jeunes')" data-i18n="table.th_jeunes">Jeunes ↕</th>
               <th>RPP</th>
               <th>P&S</th>
               <th onclick="sortTable('score_total')">Score /100 ↕</th>
@@ -218,21 +221,21 @@
 
       <div class="spatial-sidebar">
         <div class="spatial-modes">
-          <button class="spatial-mode-btn active" onclick="switchSpatialMode('global', this)">🧭 Vue globale</button>
-          <button class="spatial-mode-btn" onclick="switchSpatialMode('rayon', this)">📍 Par rayon</button>
-          <button class="spatial-mode-btn" onclick="switchSpatialMode('comparer', this)">⚖️ Comparer</button>
-          <button class="spatial-mode-btn" onclick="switchSpatialMode('isolees', this)">⚠️ Isolées</button>
+          <button class="spatial-mode-btn active" onclick="switchSpatialMode('global', this)" data-i18n="spatial.mode_global">🧭 Vue globale</button>
+          <button class="spatial-mode-btn" onclick="switchSpatialMode('rayon', this)" data-i18n="spatial.mode_rayon">📍 Par rayon</button>
+          <button class="spatial-mode-btn" onclick="switchSpatialMode('comparer', this)" data-i18n="spatial.mode_comparer">⚖️ Comparer</button>
+          <button class="spatial-mode-btn" onclick="switchSpatialMode('isolees', this)" data-i18n="spatial.mode_isolees">⚠️ Isolées</button>
         </div>
         <!-- Panel : rayon -->
         <div class="spatial-panel" id="panel-rayon" style="display:none">
           <div class="sp-field">
-            <label class="sp-label">Communauté de référence</label>
+            <label class="sp-label" data-i18n="spatial.ref_community">Communauté de référence</label>
             <select class="sp-select" id="spatialCommuneSelect">
-              <option value="">— Choisir une communauté —</option>
+              <option value="" data-i18n="spatial.choose_community">— Choisir une communauté —</option>
             </select>
           </div>
           <div class="sp-field">
-            <label class="sp-label">Rayon de recherche</label>
+            <label class="sp-label" data-i18n="spatial.search_radius">Rayon de recherche</label>
             <div class="sp-rayon-chips">
               <button class="sp-chip" onclick="setRayonChip(this,5,'spatialRayon')">5 km</button>
               <button class="sp-chip active" onclick="setRayonChip(this,10,'spatialRayon')">10 km</button>
@@ -241,25 +244,25 @@
             </div>
             <input type="hidden" id="spatialRayon" value="10">
           </div>
-          <button class="sp-btn" onclick="lancerRechercheRayon()">🔍 Rechercher les communautés proches</button>
+          <button class="sp-btn" onclick="lancerRechercheRayon()" data-i18n="spatial.btn_search_radius">🔍 Rechercher les communautés proches</button>
         </div>
 
         <!-- Panel : comparer -->
         <div class="spatial-panel" id="panel-comparer" style="display:none">
           <div class="sp-field">
-            <label class="sp-label">Communauté A</label>
+            <label class="sp-label" data-i18n="spatial.community_a">Communauté A</label>
             <select class="sp-select" id="compareA">
-              <option value="">— Choisir —</option>
+              <option value="" data-i18n="spatial.choose">— Choisir —</option>
             </select>
           </div>
           <div class="sp-field">
-            <label class="sp-label">Communauté B</label>
+            <label class="sp-label" data-i18n="spatial.community_b">Communauté B</label>
             <select class="sp-select" id="compareB">
-              <option value="">— Choisir —</option>
+              <option value="" data-i18n="spatial.choose">— Choisir —</option>
             </select>
           </div>
           <div class="sp-field">
-            <label class="sp-label">Rayon de comparaison</label>
+            <label class="sp-label" data-i18n="spatial.compare_radius">Rayon de comparaison</label>
             <div class="sp-rayon-chips">
               <button class="sp-chip" onclick="setRayonChip(this,10,'compareRayon')">10 km</button>
               <button class="sp-chip active" onclick="setRayonChip(this,20,'compareRayon')">20 km</button>
@@ -267,13 +270,13 @@
             </div>
             <input type="hidden" id="compareRayon" value="20">
           </div>
-          <button class="sp-btn" onclick="lancerComparaison()">⚖️ Comparer ces 2 communautés</button>
+          <button class="sp-btn" onclick="lancerComparaison()" data-i18n="spatial.btn_compare">⚖️ Comparer ces 2 communautés</button>
         </div>
 
         <!-- Panel : isolées -->
         <div class="spatial-panel" id="panel-isolees" style="display:none">
           <div class="sp-field">
-            <label class="sp-label">Seuil d'isolement</label>
+            <label class="sp-label" data-i18n="spatial.isolation_threshold">Seuil d'isolement</label>
             <div class="sp-rayon-chips">
               <button class="sp-chip" onclick="setRayonChip(this,10,'isoleesSeuil')">10 km</button>
               <button class="sp-chip active" onclick="setRayonChip(this,15,'isoleesSeuil')">15 km</button>
@@ -282,31 +285,31 @@
             </div>
             <input type="hidden" id="isoleesSeuil" value="15">
           </div>
-          <button class="sp-btn" onclick="lancerAnalyseIsolees()">⚠️ Identifier les communautés isolées</button>
+          <button class="sp-btn" onclick="lancerAnalyseIsolees()" data-i18n="spatial.btn_isolees">⚠️ Identifier les communautés isolées</button>
         </div>
 
         <!-- Panel : global -->
         <div class="spatial-panel" id="panel-global">
-          <div class="spatial-info-box" style="margin:0">
+          <div class="spatial-info-box" style="margin:0" data-i18n="spatial.global_info">
             Analysez la répartition des 300 communautés pilotes selon le nombre de jeunes 15-35 ans et la zone géographique.
           </div>
           <div class="sp-field" style="margin-top:16px">
-            <label class="sp-label">Filtrer par zone</label>
+            <label class="sp-label" data-i18n="spatial.filter_zone">Filtrer par zone</label>
             <select class="sp-select" id="globalZoneFilter" onchange="lancerAnalyseGlobale()">
-              <option value="">— Toutes les zones —</option>
+              <option value="" data-i18n="spatial.all_zones_dash">— Toutes les zones —</option>
               <option value="1">Zone 1 — Kolda &amp; Sédhiou</option>
               <option value="2">Zone 2 — Tamba &amp; Kédougou</option>
               <option value="3">Zone 3 — Matam</option>
             </select>
           </div>
           <div class="sp-field" style="margin-top:12px">
-            <label class="sp-label">Filtrer par tranche de jeunes 15-35</label>
+            <label class="sp-label" data-i18n="spatial.filter_jeunes">Filtrer par tranche de jeunes 15-35</label>
             <select class="sp-select" id="globalJeunesFilter" onchange="lancerAnalyseGlobale()">
-              <option value="">— Toutes les tranches —</option>
-              <option value="0-200">Moins de 200 jeunes</option>
-              <option value="200-500">200 à 500 jeunes</option>
-              <option value="500-1000">500 à 1 000 jeunes</option>
-              <option value="1000-99999">Plus de 1 000 jeunes</option>
+              <option value="" data-i18n="spatial.all_tranches_dash">— Toutes les tranches —</option>
+              <option value="0-200" data-i18n="spatial.tranche_0_200">Moins de 200 jeunes</option>
+              <option value="200-500" data-i18n="spatial.tranche_200_500">200 à 500 jeunes</option>
+              <option value="500-1000" data-i18n="spatial.tranche_500_1000">500 à 1 000 jeunes</option>
+              <option value="1000-99999" data-i18n="spatial.tranche_1000_plus">Plus de 1 000 jeunes</option>
             </select>
           </div>
         </div>
@@ -324,94 +327,94 @@
   <div class="tab-content" id="tab-rapport">
     <div class="rapport-page">
       <div class="docs-section">
-        <h3 class="docs-title">📁 Documents officiels</h3>
+        <h3 class="docs-title" data-i18n="rapport.docs_title">📁 Documents officiels</h3>
         <div class="docs-grid">
           <div class="doc-card">
             <div class="doc-icon">📊</div>
             <div class="doc-info">
-              <div class="doc-name">Présentation PowerPoint</div>
-              <div class="doc-desc">Méthodologie de sélection — 7 slides</div>
+              <div class="doc-name" data-i18n="rapport.pptx_name">Présentation PowerPoint</div>
+              <div class="doc-desc" data-i18n="rapport.pptx_desc">Méthodologie de sélection — 7 slides</div>
             </div>
             <div class="doc-actions">
-              <button class="doc-btn doc-preview" onclick="ouvrirApercu('pptx')">👁 Aperçu</button>
+              <button class="doc-btn doc-preview" onclick="ouvrirApercu('pptx')" data-i18n="rapport.preview">👁 Aperçu</button>
               <a class="doc-btn doc-download"
                  href="documents/Methodologie_Selection_JOJ_Tostan_2026.pptx"
-                 download>⬇ Télécharger</a>
+                 download data-i18n="rapport.download">⬇ Télécharger</a>
             </div>
           </div>
 
           <div class="doc-card">
             <div class="doc-icon">📄</div>
             <div class="doc-info">
-              <div class="doc-name">Rapport PDF</div>
-              <div class="doc-desc">Méthodologie complète — 7 pages (non modifiable)</div>
+              <div class="doc-name" data-i18n="rapport.pdf_name">Rapport PDF</div>
+              <div class="doc-desc" data-i18n="rapport.pdf_desc">Méthodologie complète — 7 pages (non modifiable)</div>
             </div>
             <div class="doc-actions">
-              <button class="doc-btn doc-preview" onclick="ouvrirApercu('pdf')">👁 Aperçu</button>
+              <button class="doc-btn doc-preview" onclick="ouvrirApercu('pdf')" data-i18n="rapport.preview">👁 Aperçu</button>
               <a class="doc-btn doc-download"
                  href="documents/Methodologie_Selection_JOJ_Tostan_2026.pdf"
-                 download>⬇ Télécharger</a>
+                 download data-i18n="rapport.download">⬇ Télécharger</a>
             </div>
           </div>
         </div>
       </div>
 
-      <h2>📄 Résumé exécutif — Sélection JOJ × Tostan 2026</h2>
+      <h2 data-i18n="rapport.summary_title">📄 Résumé exécutif — Sélection JO'TALI × Tostan 2026</h2>
       <div class="rapport-grid">
         <div class="stat-bloc">
           <div class="number">300</div>
-          <div class="desc">communautés sélectionnées dans 3 zones du Sénégal</div>
+          <div class="desc" data-i18n="rapport.stat_300">communautés sélectionnées dans 3 zones du Sénégal</div>
         </div>
         <div class="stat-bloc z1">
           <div class="number">91 219</div>
-          <div class="desc">jeunes 15-35 ans estimés touchés</div>
+          <div class="desc" data-i18n="rapport.stat_jeunes">jeunes 15-35 ans estimés touchés</div>
         </div>
         <div class="stat-bloc z2">
           <div class="number">20</div>
-          <div class="desc">communautés PRCC EN COURS (priorité absolue)</div>
+          <div class="desc" data-i18n="rapport.stat_prcc">communautés PRCC EN COURS (priorité absolue)</div>
         </div>
         <div class="stat-bloc z3">
           <div class="number">121</div>
-          <div class="desc">communautés avec programme RPP actif</div>
+          <div class="desc" data-i18n="rapport.stat_rpp">communautés avec programme RPP actif</div>
         </div>
         <div class="stat-bloc">
           <div class="number">57</div>
-          <div class="desc">score moyen de sélection sur 100 points</div>
+          <div class="desc" data-i18n="rapport.stat_moy">score moyen de sélection sur 100 points</div>
         </div>
         <div class="stat-bloc">
           <div class="number">80</div>
-          <div class="desc">score maximum atteint (Boumouda Soucoto, Sédhiou)</div>
+          <div class="desc" data-i18n="rapport.stat_max">score maximum atteint (Boumouda Soucoto, Sédhiou)</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px" id="topZones"></div>
       <div class="top-table">
-        <h3>🏆 Grille de sélection — 4 critères sur 100 points</h3>
+        <h3 data-i18n="rapport.grille_title">🏆 Grille de sélection — 4 critères sur 100 points</h3>
         <div class="top-row">
           <span class="top-rank">1</span>
-          <span class="top-nom">PRCC récent ou EN COURS</span>
+          <span class="top-nom" data-i18n="rapport.crit1_nom">PRCC récent ou EN COURS</span>
           <span class="top-score" style="color:#8E44AD">35 pts</span>
-          <span class="top-zone">Lien Tostan le plus frais — priorité absolue</span>
+          <span class="top-zone" data-i18n="rapport.crit1_desc">Lien Tostan le plus frais — priorité absolue</span>
         </div>
         <div class="top-row">
           <span class="top-rank">2</span>
-          <span class="top-nom">Nombre de jeunes 15-35 ans (estimés)</span>
+          <span class="top-nom" data-i18n="rapport.crit2_nom">Nombre de jeunes 15-35 ans (estimés)</span>
           <span class="top-score" style="color:#F39C12">30 pts</span>
-          <span class="top-zone">Bassin de participants suffisant</span>
+          <span class="top-zone" data-i18n="rapport.crit2_desc">Bassin de participants suffisant</span>
         </div>
         <div class="top-row">
           <span class="top-rank">3</span>
-          <span class="top-nom">Communautés Tostan proches (même commune)</span>
+          <span class="top-nom" data-i18n="rapport.crit3_nom">Communautés Tostan proches (même commune)</span>
           <span class="top-score" style="color:#2980B9">20 pts</span>
-          <span class="top-zone">Facilité logistique & rencontres entre jeunes</span>
+          <span class="top-zone" data-i18n="rapport.crit3_desc">Facilité logistique & rencontres entre jeunes</span>
         </div>
         <div class="top-row">
           <span class="top-rank">4</span>
-          <span class="top-nom">Autres programmes actifs (RPP, P&S)</span>
+          <span class="top-nom" data-i18n="rapport.crit4_nom">Autres programmes actifs (RPP, P&S)</span>
           <span class="top-score" style="color:#27AE60">15 pts</span>
-          <span class="top-zone">Accompagnement Tostan renforcé sur le terrain</span>
+          <span class="top-zone" data-i18n="rapport.crit4_desc">Accompagnement Tostan renforcé sur le terrain</span>
         </div>
       </div>
-      <button onclick="window.print()" style="padding:10px 24px;border-radius:8px;border:none;background:var(--dark);color:#fff;cursor:pointer;font-size:.85rem;font-weight:700;">
+      <button onclick="window.print()" style="padding:10px 24px;border-radius:8px;border:none;background:var(--dark);color:#fff;cursor:pointer;font-size:.85rem;font-weight:700;" data-i18n="rapport.export_pdf">
         🖨️ Exporter en PDF (Ctrl+P)
       </button>
     </div>
@@ -420,7 +423,7 @@
   <div id="docModal" class="doc-modal" onclick="fermerApercu(event)">
     <div class="doc-modal-content">
       <div class="doc-modal-header">
-        <span id="docModalTitle">Aperçu</span>
+        <span id="docModalTitle" data-i18n="rapport.modal_preview">Aperçu</span>
         <button class="doc-modal-close" onclick="fermerApercu()" aria-label="Fermer">✕</button>
       </div>
       <div class="doc-modal-body">
@@ -436,6 +439,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/data.js"></script>
 <script src="js/map.js"></script>
 <script src="js/charts.js"></script>
@@ -447,12 +451,12 @@ function ouvrirApercu(type) {
   const base = window.location.href.split('?')[0].split('#')[0].replace(/[^/]+$/, '');
   const configs = {
     pptx: {
-      title: 'Présentation — Méthodologie de sélection',
+      title: t('rapport.js_pptx_title'),
       src: 'https://view.officeapps.live.com/op/embed.aspx?src=' +
            encodeURIComponent(base + 'documents/Methodologie_Selection_JOJ_Tostan_2026.pptx')
     },
     pdf: {
-      title: 'Rapport PDF — Méthodologie complète',
+      title: t('rapport.js_pdf_title'),
       src: base + 'documents/Methodologie_Selection_JOJ_Tostan_2026.pdf'
     }
   };
@@ -500,7 +504,7 @@ function animateKPIs() {
     const tick = now => {
       const p = Math.min((now - start) / DURATION, 1);
       const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
-      el.textContent = Math.round(eased * target).toLocaleString('fr-FR');
+      el.textContent = fmtNum(Math.round(eased * target));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -514,10 +518,7 @@ function animateKPIs() {
   });
 }
 
-let rapportBuilt = false;
 function buildRapport() {
-  if (rapportBuilt) return;
-  rapportBuilt = true;
   const zones = [
     { id:1, label:'Zone 1 — Kolda & Sédhiou', color:'#27AE60' },
     { id:2, label:'Zone 2 — Tamba & Kédougou', color:'#E74C3C' },
@@ -528,7 +529,7 @@ function buildRapport() {
                          .sort((a,b) => b.score_total - a.score_total)
                          .slice(0,5);
     return `<div class="top-table">
-      <h3 style="color:${z.color}">🏆 Top 5 · ${z.label}</h3>
+      <h3 style="color:${z.color}">${t('rapport.top5')} ${z.label}</h3>
       ${top5.map((d,i)=>`
         <div class="top-row">
           <span class="top-rank">${i+1}</span>
@@ -538,6 +539,20 @@ function buildRapport() {
     </div>`;
   }).join('');
 }
+
+document.addEventListener('DOMContentLoaded', animateKPIs);
+
+document.addEventListener('jojlangchange', () => {
+  if (typeof chartsBuilt !== 'undefined' && chartsBuilt) {
+    chartsBuilt = false;
+    if (typeof destroyCharts === 'function') destroyCharts();
+    buildCharts();
+  }
+  if (typeof tableReady !== 'undefined' && tableReady) renderTable();
+  if (typeof refreshMapI18n === 'function') refreshMapI18n();
+  if (typeof refreshSpatialI18n === 'function') refreshSpatialI18n();
+  if (document.getElementById('tab-rapport').classList.contains('active')) buildRapport();
+});
 </script>
 <script src="js/spatial.js"></script>
 <script src="js/spatial-ui.js"></script>
